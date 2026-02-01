@@ -18,7 +18,11 @@ import os
 
 # Data paths
 CURRENT_DIR = Path(__file__).parent
-CSV_PATH = Path("/Users/rachael/Documents/projects/rachaelroland/pipelines/pipelines/311/data/processed/311_processed_with_nlp.csv")
+# Use sample data for deployment, full data for local development
+CSV_PATH = CURRENT_DIR / "sample_311_data.csv"
+if not CSV_PATH.exists():
+    # Fallback to full dataset if available locally
+    CSV_PATH = Path("/Users/rachael/Documents/projects/rachaelroland/pipelines/pipelines/311/data/processed/311_processed_with_nlp.csv")
 JSON_PATH = CURRENT_DIR / "311_nlp_results.json"
 
 # Load data on startup
