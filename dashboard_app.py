@@ -251,8 +251,15 @@ def create_topic_wordcloud():
 
 @rt('/')
 def get():
-    """Homepage with overview"""
-    stats = get_summary_stats()
+    """Homepage with overview - simplified for testing"""
+    return Title('311 NLP Analysis Dashboard'), Main(
+        create_nav('home'),
+        Div(
+            H1('Louisville Metro 311 Dashboard'),
+            P(f'Loaded {len(df):,} service requests'),
+            cls='container-fluid px-4'
+        )
+    )
 
     # Create metric cards
     metric_cards = Div(
