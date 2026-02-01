@@ -1,0 +1,5 @@
+fasthtml>=0.6.0
+pandas>=2.0.0
+plotly>=5.18.0
+python-fasthtml>=0.6.0
+uvicorn>=0.24.0
