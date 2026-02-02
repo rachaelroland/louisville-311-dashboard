@@ -11,6 +11,8 @@ import plotly.graph_objects as go
 import plotly.express as px
 from pathlib import Path
 import os
+from anthropic import Anthropic
+from datetime import datetime
 
 # ============================================================================
 # CONFIGURATION
@@ -33,6 +35,15 @@ with open(JSON_PATH, 'r') as f:
 
 print(f"Loaded {len(df):,} service requests")
 
+# Initialize Anthropic client for chat
+try:
+    anthropic_client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+    CHAT_ENABLED = True
+except Exception as e:
+    print(f"Warning: Anthropic API not available: {e}")
+    anthropic_client = None
+    CHAT_ENABLED = False
+
 # ============================================================================
 # FASTHTML APP SETUP
 # ============================================================================
@@ -41,6 +52,66 @@ app, rt = fast_app(
     hdrs=(
         Link(rel='stylesheet', href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css'),
         Script(src='https://cdn.plot.ly/plotly-2.27.0.min.js'),
+        Style("""
+            .chat-container {
+                max-width: 900px;
+                margin: 2rem auto;
+                height: 500px;
+                overflow-y: auto;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                padding: 1.5rem;
+                background: white;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+            .message {
+                margin-bottom: 1rem;
+                padding: 0.75rem 1rem;
+                border-radius: 8px;
+                max-width: 75%;
+                line-height: 1.5;
+            }
+            .user-message {
+                background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+                color: white;
+                margin-left: auto;
+                text-align: right;
+            }
+            .assistant-message {
+                background: #f3f4f6;
+                color: #1f2937;
+                border-left: 4px solid #2193b0;
+            }
+            .chat-input-form {
+                max-width: 900px;
+                margin: 1rem auto;
+                padding: 1.5rem;
+                background: white;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+            .timestamp {
+                font-size: 0.75rem;
+                color: #6b7280;
+                margin-top: 0.25rem;
+            }
+            .quick-questions {
+                max-width: 900px;
+                margin: 1rem auto;
+            }
+            .quick-question-btn {
+                margin: 0.25rem;
+            }
+            .chat-welcome {
+                max-width: 900px;
+                margin: 2rem auto;
+                padding: 2rem;
+                background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+                border-radius: 8px;
+                border: 1px solid #0ea5e9;
+            }
+        """)
     )
 )
 
@@ -64,6 +135,7 @@ def create_nav(current_page=None):
         {'text': '😊 Sentiment', 'href': '/sentiment', 'page': 'sentiment'},
         {'text': '🚨 Urgency', 'href': '/urgency', 'page': 'urgency'},
         {'text': '💼 Business Opportunities', 'href': '/business', 'page': 'business'},
+        {'text': '💬 Ask Questions', 'href': '/chat', 'page': 'chat'},
     ]
 
     return Div(
@@ -1054,6 +1126,214 @@ def get():
             cls='container-fluid px-4'
         )
     )
+
+# ============================================================================
+# CHAT INTERFACE
+# ============================================================================
+
+def build_311_context():
+    """Build context about the 311 dataset for Claude"""
+
+    # Basic stats
+    total = len(df)
+    sentiment_counts = df['sentiment'].value_counts().to_dict()
+    urgency_counts = df['urgency_level'].value_counts().to_dict()
+
+    # Top issues
+    top_services = df['service_name'].value_counts().head(10).to_dict()
+
+    # Critical requests
+    critical = df[
+        (df['urgency_level'] == 'high') &
+        (df['sentiment'] == 'negative')
+    ]
+    critical_count = len(critical)
+
+    context = f"""You are a helpful assistant for the Louisville Metro 311 Service Request Dashboard.
+
+DATASET OVERVIEW:
+- Total service requests: {total:,}
+- Date range: 2024
+- Data source: Louisville Metro Government 311 system
+
+SENTIMENT DISTRIBUTION:
+{json.dumps(sentiment_counts, indent=2)}
+
+URGENCY DISTRIBUTION:
+{json.dumps(urgency_counts, indent=2)}
+
+TOP 10 SERVICE REQUEST TYPES:
+{json.dumps(top_services, indent=2)}
+
+KEY INSIGHTS:
+- {critical_count} CRITICAL requests (high urgency + negative sentiment)
+- Most common issue: {df['service_name'].value_counts().index[0]} ({df['service_name'].value_counts().iloc[0]:,} requests)
+- {sentiment_counts.get('negative', 0):,} requests have negative sentiment ({sentiment_counts.get('negative', 0)/total*100:.1f}%)
+- {urgency_counts.get('high', 0):,} requests are high urgency ({urgency_counts.get('high', 0)/total*100:.1f}%)
+
+BUSINESS OPPORTUNITY:
+- Call center bottleneck analysis shows $125,075 annual savings potential
+- Main bottlenecks: NSR (48.4%), Waste Management (14.9%), Status Checks (49.4%)
+
+INSTRUCTIONS:
+- Answer questions concisely and helpfully based on this dataset
+- Provide specific numbers and percentages when relevant
+- If asked about trends or patterns, refer to the data above
+- If a question can't be answered with this data, say so clearly
+- Keep responses under 200 words unless more detail is specifically requested
+- Be friendly and professional
+- Use bullet points for lists when appropriate"""
+
+    return context
+
+CHAT_CONTEXT = build_311_context() if CHAT_ENABLED else ""
+
+@rt('/chat')
+def get():
+    """Chat interface page"""
+
+    if not CHAT_ENABLED:
+        return Title("Chat Unavailable"), Main(
+            create_nav('chat'),
+            Div(
+                H2("Chat Assistant Unavailable", cls="text-center mb-4"),
+                P("The chat assistant requires an Anthropic API key to be configured.",
+                  cls="text-center text-muted"),
+                P("Please contact the administrator to enable this feature.",
+                  cls="text-center text-muted"),
+                cls="container mt-5"
+            )
+        )
+
+    quick_questions = [
+        "What are the top 5 service request types?",
+        "How many requests are high urgency?",
+        "What is the sentiment breakdown?",
+        "Tell me about the call center bottlenecks",
+        "How much money can we save?",
+        "What are the critical issues right now?",
+    ]
+
+    return Title("311 Chat Assistant"), Main(
+        create_nav('chat'),
+
+        # Welcome section
+        Div(
+            H2("💬 Ask Me Anything About 311 Data", cls="mb-3", style="color: #2193b0;"),
+            P(
+                f"I have information about {len(df):,} service requests from 2024. "
+                "Ask questions in plain English and I'll provide insights based on the data.",
+                cls="mb-3"
+            ),
+            P(
+                "💡 Tip: Try asking about sentiment, urgency levels, top issues, or business opportunities.",
+                cls="text-muted mb-0",
+                style="font-size: 0.9rem;"
+            ),
+            cls="chat-welcome"
+        ),
+
+        # Quick question suggestions
+        Div(
+            H5("Try these questions:", cls="mb-3"),
+            *[
+                Button(
+                    q,
+                    cls="btn btn-sm btn-outline-primary quick-question-btn",
+                    hx_post="/chat/ask",
+                    hx_vals=f'{{"message": "{q}"}}',
+                    hx_target="#chat-history",
+                    hx_swap="beforeend",
+                    onclick="document.querySelector('.chat-container').scrollTop = document.querySelector('.chat-container').scrollHeight;"
+                )
+                for q in quick_questions
+            ],
+            cls="quick-questions"
+        ),
+
+        # Chat history container
+        Div(
+            Div(
+                "👋 Hello! I'm your 311 data assistant. Ask me anything about the service requests!",
+                cls="message assistant-message",
+                style="display: inline-block;"
+            ),
+            id="chat-history",
+            cls="chat-container"
+        ),
+
+        # Chat input form
+        Form(
+            Div(
+                Div(
+                    Input(
+                        name="message",
+                        placeholder="Ask a question about 311 service requests...",
+                        cls="form-control form-control-lg",
+                        required=True,
+                        autofocus=True,
+                        id="chat-input"
+                    ),
+                    cls="col-10"
+                ),
+                Div(
+                    Button("Send", type="submit", cls="btn btn-primary btn-lg w-100"),
+                    cls="col-2"
+                ),
+                cls="row g-2"
+            ),
+            hx_post="/chat/ask",
+            hx_target="#chat-history",
+            hx_swap="beforeend",
+            hx_on_htmx_after_request="this.reset(); document.querySelector('.chat-container').scrollTop = document.querySelector('.chat-container').scrollHeight;",
+            cls="chat-input-form"
+        ),
+
+        cls='container-fluid px-4'
+    )
+
+@rt('/chat/ask')
+def post(message: str):
+    """Handle chat message and return response"""
+
+    if not CHAT_ENABLED or not message or message.strip() == "":
+        return Div("Please enter a question.", cls="alert alert-warning")
+
+    timestamp = datetime.now().strftime("%I:%M %p")
+
+    # User message bubble
+    user_msg = Div(
+        Div(message, cls="message user-message"),
+        Div(timestamp, cls="timestamp text-end"),
+        style="display: flex; flex-direction: column; align-items: flex-end;"
+    )
+
+    # Call Claude API
+    try:
+        response = anthropic_client.messages.create(
+            model="claude-sonnet-4-5-20250929",
+            max_tokens=1024,
+            temperature=0.7,
+            system=CHAT_CONTEXT,
+            messages=[
+                {"role": "user", "content": message}
+            ]
+        )
+
+        assistant_text = response.content[0].text
+
+    except Exception as e:
+        assistant_text = f"I apologize, but I encountered an error processing your question: {str(e)}"
+
+    # Assistant message bubble
+    assistant_msg = Div(
+        Div(assistant_text, cls="message assistant-message"),
+        Div(timestamp, cls="timestamp"),
+        style="display: flex; flex-direction: column; align-items: flex-start;"
+    )
+
+    # Return both messages
+    return Div(user_msg, assistant_msg)
 
 # ============================================================================
 # RUN APP
