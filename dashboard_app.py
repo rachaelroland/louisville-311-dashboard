@@ -206,21 +206,34 @@ def create_top_services_bar():
 
 def create_topic_wordcloud():
     """Create topic visualization from LDA results"""
-    lda_topics = topic_data.get('topic_modeling', {}).get('lda', {}).get('topics', [])
+    lda_topics_dict = topic_data.get('topic_modeling', {}).get('lda', {}).get('topics', {})
 
-    if not lda_topics:
+    if not lda_topics_dict or not isinstance(lda_topics_dict, dict):
         return "<p>No topic modeling data available</p>"
 
     # Create simple bar chart of top keywords from top 5 topics
     topic_labels = []
     topic_weights = []
 
-    for i, topic in enumerate(lda_topics[:5]):
-        keywords = topic.get('top_keywords', [])[:5]
-        weight = topic.get('weight', 0)
+    # Get first 5 topics from the dictionary
+    for i in range(min(5, len(lda_topics_dict))):
+        topic_key = str(i)
+        if topic_key not in lda_topics_dict:
+            continue
+
+        topic = lda_topics_dict[topic_key]
+        keywords = topic.get('keywords', [])[:5]
+        weights = topic.get('weights', [])
+
+        # Calculate average weight for this topic
+        avg_weight = sum(weights[:5]) / len(weights[:5]) if weights else 0
+
         label = f"Topic {i+1}: {', '.join(keywords)}"
         topic_labels.append(label)
-        topic_weights.append(weight * 100)
+        topic_weights.append(avg_weight * 100)
+
+    if not topic_labels:
+        return "<p>No topics found</p>"
 
     fig = go.Figure(data=[go.Bar(
         y=topic_labels[::-1],
@@ -251,12 +264,170 @@ def create_topic_wordcloud():
 
 @rt('/')
 def get():
-    """Homepage with overview - simplified for testing"""
+    """Homepage with interactive overview and charts"""
+    stats = get_summary_stats()
+
+    # Create metric cards
+    metric_cards = Div(
+        Div(
+            # Total requests
+            Div(
+                H3(f"{stats['total']:,}", style='font-size: 2.5rem; font-weight: 700; color: #2193b0; margin-bottom: 0.5rem;'),
+                P('Total Requests', style='color: #6b7280; font-size: 1.1rem; margin: 0;'),
+                style='background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;',
+                cls='col-md-3'
+            ),
+            # Negative sentiment
+            Div(
+                H3(f"{stats['sentiment'].get('negative', 0):,}", style='font-size: 2.5rem; font-weight: 700; color: #ef4444; margin-bottom: 0.5rem;'),
+                P('Negative Sentiment', style='color: #6b7280; font-size: 1.1rem; margin: 0;'),
+                P(f"{stats['sentiment'].get('negative', 0) / stats['total'] * 100:.1f}%", style='color: #ef4444; font-size: 0.9rem; margin-top: 0.5rem;'),
+                style='background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;',
+                cls='col-md-3'
+            ),
+            # High urgency
+            Div(
+                H3(f"{stats['urgency'].get('high', 0):,}", style='font-size: 2.5rem; font-weight: 700; color: #f59e0b; margin-bottom: 0.5rem;'),
+                P('High Urgency', style='color: #6b7280; font-size: 1.1rem; margin: 0;'),
+                P(f"{stats['urgency'].get('high', 0) / stats['total'] * 100:.1f}%", style='color: #f59e0b; font-size: 0.9rem; margin-top: 0.5rem;'),
+                style='background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;',
+                cls='col-md-3'
+            ),
+            # Top issue
+            Div(
+                H3(list(stats['services'].keys())[0] if stats['services'] else 'N/A', style='font-size: 1.2rem; font-weight: 700; color: #10b981; margin-bottom: 0.5rem;'),
+                P('Top Issue', style='color: #6b7280; font-size: 1.1rem; margin: 0;'),
+                P(f"{list(stats['services'].values())[0]:,} requests" if stats['services'] else '', style='color: #10b981; font-size: 0.9rem; margin-top: 0.5rem;'),
+                style='background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;',
+                cls='col-md-3'
+            ),
+            cls='row g-4 mb-4'
+        )
+    )
+
+    # Key insights panel
+    insights_panel = Div(
+        H3('🎯 Key Insights & Actions', style='color: #1f2937; margin-bottom: 1.5rem;'),
+        Div(
+            Div(
+                H5('1. High Negative Sentiment', style='color: #ef4444;'),
+                P(f"{stats['sentiment'].get('negative', 0):,} requests ({stats['sentiment'].get('negative', 0) / stats['total'] * 100:.1f}%) are negative"),
+                Strong('Action: '), Span('Focus on root causes of dissatisfaction'),
+                A('View Details →', href='/sentiment', cls='btn btn-sm btn-outline-danger mt-2'),
+                style='background: #fef2f2; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #ef4444;',
+                cls='col-md-6 mb-3'
+            ),
+            Div(
+                H5('2. Top Service Request', style='color: #2193b0;'),
+                P(f"{list(stats['services'].keys())[0]}: {list(stats['services'].values())[0]:,} requests"),
+                Strong('Action: '), Span('Optimize handling of most common request type'),
+                A('Explore Topics →', href='/topics', cls='btn btn-sm btn-outline-primary mt-2'),
+                style='background: #f0f9ff; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #2193b0;',
+                cls='col-md-6 mb-3'
+            ),
+            Div(
+                H5('3. Call Center Opportunity', style='color: #10b981;'),
+                P('Potential to save $125K/year through automation'),
+                Strong('Action: '), Span('Review self-service opportunities'),
+                A('See Business Case →', href='/business', cls='btn btn-sm btn-outline-success mt-2'),
+                style='background: #f0fdf4; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #10b981;',
+                cls='col-md-6 mb-3'
+            ),
+            Div(
+                H5('4. Urgent Issues Needing Attention', style='color: #f59e0b;'),
+                P(f"{stats['urgency'].get('high', 0):,} high-urgency requests requiring immediate response"),
+                Strong('Action: '), Span('Prioritize resource allocation'),
+                A('View Urgency →', href='/urgency', cls='btn btn-sm btn-outline-warning mt-2'),
+                style='background: #fffbeb; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #f59e0b;',
+                cls='col-md-6 mb-3'
+            ),
+            cls='row'
+        ),
+        style='background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;'
+    )
+
+    # Charts row
+    charts = Div(
+        Div(
+            # Sentiment pie
+            Div(
+                Div(NotStr(create_sentiment_pie())),
+                style='background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);',
+                cls='col-md-6 mb-4'
+            ),
+            # Urgency bar
+            Div(
+                Div(NotStr(create_urgency_bar())),
+                style='background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);',
+                cls='col-md-6 mb-4'
+            ),
+            cls='row'
+        ),
+        Div(
+            # Top services
+            Div(
+                Div(NotStr(create_top_services_bar())),
+                style='background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);',
+                cls='col-md-6 mb-4'
+            ),
+            # Topics
+            Div(
+                Div(NotStr(create_topic_wordcloud())),
+                style='background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);',
+                cls='col-md-6 mb-4'
+            ),
+            cls='row'
+        )
+    )
+
+    # Top 10 sample requests table
+    sample_requests_data = df.head(10).to_dict('records')
+
+    requests_table = Div(
+        H3('📋 Sample Service Requests', style='color: #1f2937; margin-bottom: 1.5rem;'),
+        Table(
+            Thead(
+                Tr(
+                    Th('Request ID'),
+                    Th('Service Type'),
+                    Th('Description'),
+                    Th('Sentiment'),
+                    Th('Urgency')
+                )
+            ),
+            Tbody(
+                *[
+                    Tr(
+                        Td(str(row.get('service_request_id', ''))),
+                        Td(str(row.get('service_name', ''))[:40] + '...' if len(str(row.get('service_name', ''))) > 40 else str(row.get('service_name', ''))),
+                        Td(str(row.get('description', ''))[:60] + '...' if len(str(row.get('description', ''))) > 60 else str(row.get('description', ''))),
+                        Td(
+                            Span(str(row.get('sentiment', '')),
+                                 style=f"color: {'#22c55e' if row.get('sentiment') == 'positive' else '#ef4444' if row.get('sentiment') == 'negative' else '#6b7280'}; font-weight: 600;"
+                            ) if row.get('sentiment') else Span('-')
+                        ),
+                        Td(
+                            Span(str(row.get('urgency_level', '')),
+                                 style=f"color: {'#ef4444' if row.get('urgency_level') == 'high' else '#f59e0b' if row.get('urgency_level') == 'medium' else '#22c55e'}; font-weight: 600;"
+                            ) if row.get('urgency_level') else Span('-')
+                        )
+                    )
+                    for row in sample_requests_data
+                ]
+            ),
+            cls='table table-striped table-hover'
+        ),
+        style='background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow-x: auto;'
+    )
+
     return Title('311 NLP Analysis Dashboard'), Main(
         create_nav('home'),
         Div(
-            H1('Louisville Metro 311 Dashboard'),
-            P(f'Loaded {len(df):,} service requests'),
+            H1('Overview & Insights', style='margin-bottom: 2rem; color: #1f2937;'),
+            metric_cards,
+            insights_panel,
+            charts,
+            requests_table,
             cls='container-fluid px-4'
         )
     )
@@ -475,43 +646,314 @@ def get():
 
 @rt('/topics')
 def get():
-    """Topics analysis page"""
+    """Topics analysis page with top 10 service types"""
+    stats = get_summary_stats()
+
+    # Create service type cards
+    service_cards = []
+    for i, (service, count) in enumerate(list(stats['services'].items())[:10], 1):
+        pct = (count / stats['total'] * 100)
+
+        # Color based on volume
+        if i <= 3:
+            color = '#ef4444'  # Red for top 3
+        elif i <= 6:
+            color = '#f59e0b'  # Orange for 4-6
+        else:
+            color = '#2193b0'  # Blue for 7-10
+
+        service_cards.append(
+            Div(
+                Div(
+                    H4(f"#{i}", style=f'color: {color}; font-size: 2rem; margin-bottom: 0;'),
+                    H5(service, style='color: #1f2937; margin: 0.5rem 0;'),
+                    P(f"{count:,} requests", style='color: #6b7280; font-size: 1.1rem; margin-bottom: 0.5rem;'),
+                    P(f"{pct:.1f}% of total", style=f'color: {color}; font-weight: 600;'),
+                    style='background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid ' + color,
+                ),
+                cls='col-md-6 mb-3'
+            )
+        )
+
+    # Sample requests for top service
+    top_service = list(stats['services'].keys())[0]
+    top_service_requests = df[df['service_name'] == top_service].head(5)[['service_request_id', 'description', 'sentiment', 'urgency_level']].fillna('')
+
     return Title('Topics Analysis'), Main(
         create_nav('topics'),
         Div(
-            H1('Topic Analysis', style='margin-bottom: 2rem; color: #1f2937;'),
-            P('Topic modeling results from LDA and NMF analysis'),
-            P(f'Analyzing {len(df):,} service requests'),
+            H1('Service Request Topics', style='margin-bottom: 2rem; color: #1f2937;'),
+
+            # Summary
+            Div(
+                H3(f'Top 10 Service Types (out of {len(df["service_name"].unique())} unique types)', style='color: #2193b0; margin-bottom: 1.5rem;'),
+                Div(*service_cards, cls='row'),
+                style='margin-bottom: 2rem;'
+            ),
+
+            # Top service deep dive
+            Div(
+                H3(f'Deep Dive: {top_service}', style='color: #1f2937; margin-bottom: 1.5rem;'),
+                P(f'{list(stats["services"].values())[0]:,} requests ({list(stats["services"].values())[0] / stats["total"] * 100:.1f}% of total)'),
+                H5('Sample Requests:', style='margin-top: 1.5rem; color: #6b7280;'),
+                Table(
+                    Thead(Tr(Th('ID'), Th('Description'), Th('Sentiment'), Th('Urgency'))),
+                    Tbody(
+                        *[
+                            Tr(
+                                Td(row['service_request_id']),
+                                Td(str(row['description'])[:80] + '...' if len(str(row['description'])) > 80 else row['description']),
+                                Td(Span(row['sentiment'], style=f"color: {'#22c55e' if row['sentiment'] == 'positive' else '#ef4444' if row['sentiment'] == 'negative' else '#6b7280'}; font-weight: 600;")),
+                                Td(Span(row['urgency_level'], style=f"color: {'#ef4444' if row['urgency_level'] == 'high' else '#f59e0b' if row['urgency_level'] == 'medium' else '#22c55e'}; font-weight: 600;"))
+                            )
+                            for _, row in top_service_requests.iterrows()
+                        ]
+                    ),
+                    cls='table table-striped'
+                ),
+                style='background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'
+            ),
+
             cls='container-fluid px-4'
         )
     )
 
 @rt('/sentiment')
 def get():
-    """Sentiment analysis page"""
+    """Sentiment analysis page with examples"""
     stats = get_summary_stats()
+
+    # Sentiment breakdown by top service types
+    top_services = list(stats['services'].keys())[:5]
+    sentiment_by_service = []
+
+    for service in top_services:
+        service_df = df[df['service_name'] == service]
+        sent_counts = service_df['sentiment'].value_counts()
+
+        sentiment_by_service.append(
+            Tr(
+                Td(service),
+                Td(f"{len(service_df):,}"),
+                Td(f"{sent_counts.get('positive', 0):,}", style='color: #22c55e; font-weight: 600;'),
+                Td(f"{sent_counts.get('negative', 0):,}", style='color: #ef4444; font-weight: 600;'),
+                Td(f"{sent_counts.get('neutral', 0):,}", style='color: #6b7280; font-weight: 600;'),
+                Td(f"{sent_counts.get('negative', 0) / len(service_df) * 100:.1f}%", style='color: #ef4444;')
+            )
+        )
+
+    # Sample negative requests
+    negative_requests = df[df['sentiment'] == 'negative'].head(10)[['service_request_id', 'service_name', 'description', 'urgency_level']].fillna('')
+
+    # Sample positive requests
+    positive_requests = df[df['sentiment'] == 'positive'].head(5)[['service_request_id', 'service_name', 'description', 'urgency_level']].fillna('')
+
     return Title('Sentiment Analysis'), Main(
         create_nav('sentiment'),
         Div(
             H1('Sentiment Analysis', style='margin-bottom: 2rem; color: #1f2937;'),
-            P(f"Positive: {stats['sentiment'].get('positive', 0):,}"),
-            P(f"Negative: {stats['sentiment'].get('negative', 0):,}"),
-            P(f"Neutral: {stats['sentiment'].get('neutral', 0):,}"),
+
+            # Summary cards
+            Div(
+                Div(
+                    H3(f"{stats['sentiment'].get('positive', 0):,}", style='font-size: 2.5rem; color: #22c55e;'),
+                    P('Positive Requests'),
+                    P(f"{stats['sentiment'].get('positive', 0) / stats['total'] * 100:.2f}%", style='color: #22c55e;'),
+                    style='background: #f0fdf4; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; border-left: 4px solid #22c55e;',
+                    cls='col-md-4'
+                ),
+                Div(
+                    H3(f"{stats['sentiment'].get('negative', 0):,}", style='font-size: 2.5rem; color: #ef4444;'),
+                    P('Negative Requests'),
+                    P(f"{stats['sentiment'].get('negative', 0) / stats['total'] * 100:.1f}%", style='color: #ef4444;'),
+                    style='background: #fef2f2; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; border-left: 4px solid #ef4444;',
+                    cls='col-md-4'
+                ),
+                Div(
+                    H3(f"{stats['sentiment'].get('neutral', 0):,}", style='font-size: 2.5rem; color: #6b7280;'),
+                    P('Neutral Requests'),
+                    P(f"{stats['sentiment'].get('neutral', 0) / stats['total'] * 100:.1f}%", style='color: #6b7280;'),
+                    style='background: #f9fafb; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; border-left: 4px solid #6b7280;',
+                    cls='col-md-4'
+                ),
+                cls='row g-4 mb-4'
+            ),
+
+            # Sentiment by service type
+            Div(
+                H3('Sentiment by Top 5 Service Types', style='color: #1f2937; margin-bottom: 1.5rem;'),
+                Table(
+                    Thead(Tr(Th('Service Type'), Th('Total'), Th('Positive'), Th('Negative'), Th('Neutral'), Th('% Negative'))),
+                    Tbody(*sentiment_by_service),
+                    cls='table table-striped'
+                ),
+                style='background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;'
+            ),
+
+            # Sample negative requests
+            Div(
+                H3('⚠️ Sample Negative Requests', style='color: #ef4444; margin-bottom: 1.5rem;'),
+                Table(
+                    Thead(Tr(Th('ID'), Th('Service'), Th('Description'), Th('Urgency'))),
+                    Tbody(
+                        *[
+                            Tr(
+                                Td(row['service_request_id']),
+                                Td(str(row['service_name'])[:30]),
+                                Td(str(row['description'])[:80] + '...' if len(str(row['description'])) > 80 else row['description']),
+                                Td(Span(row['urgency_level'], style=f"color: {'#ef4444' if row['urgency_level'] == 'high' else '#f59e0b' if row['urgency_level'] == 'medium' else '#22c55e'}; font-weight: 600;"))
+                            )
+                            for _, row in negative_requests.iterrows()
+                        ]
+                    ),
+                    cls='table table-striped'
+                ),
+                style='background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;'
+            ),
+
+            # Sample positive requests
+            Div(
+                H3('✅ Sample Positive Requests', style='color: #22c55e; margin-bottom: 1.5rem;'),
+                Table(
+                    Thead(Tr(Th('ID'), Th('Service'), Th('Description'), Th('Urgency'))),
+                    Tbody(
+                        *[
+                            Tr(
+                                Td(row['service_request_id']),
+                                Td(str(row['service_name'])[:30]),
+                                Td(str(row['description'])[:80] + '...' if len(str(row['description'])) > 80 else row['description']),
+                                Td(Span(row['urgency_level'], style=f"color: {'#ef4444' if row['urgency_level'] == 'high' else '#f59e0b' if row['urgency_level'] == 'medium' else '#22c55e'}; font-weight: 600;"))
+                            )
+                            for _, row in positive_requests.iterrows()
+                        ]
+                    ),
+                    cls='table table-striped'
+                ),
+                style='background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'
+            ),
+
             cls='container-fluid px-4'
         )
     )
 
 @rt('/urgency')
 def get():
-    """Urgency analysis page"""
+    """Urgency analysis page with prioritization"""
     stats = get_summary_stats()
+
+    # Urgency by service type for top 5
+    top_services = list(stats['services'].keys())[:5]
+    urgency_by_service = []
+
+    for service in top_services:
+        service_df = df[df['service_name'] == service]
+        urg_counts = service_df['urgency_level'].value_counts()
+
+        urgency_by_service.append(
+            Tr(
+                Td(service),
+                Td(f"{len(service_df):,}"),
+                Td(f"{urg_counts.get('high', 0):,}", style='color: #ef4444; font-weight: 600;'),
+                Td(f"{urg_counts.get('medium', 0):,}", style='color: #f59e0b; font-weight: 600;'),
+                Td(f"{urg_counts.get('low', 0):,}", style='color: #22c55e; font-weight: 600;'),
+                Td(f"{urg_counts.get('high', 0) / len(service_df) * 100:.1f}%", style='color: #ef4444;')
+            )
+        )
+
+    # High urgency requests
+    high_urgency = df[df['urgency_level'] == 'high'].head(15)[['service_request_id', 'service_name', 'description', 'sentiment', 'urgency_score']].fillna('')
+
+    # High urgency + negative sentiment (critical)
+    critical = df[(df['urgency_level'] == 'high') & (df['sentiment'] == 'negative')].head(10)[['service_request_id', 'service_name', 'description']].fillna('')
+
     return Title('Urgency Analysis'), Main(
         create_nav('urgency'),
         Div(
-            H1('Urgency Distribution', style='margin-bottom: 2rem; color: #1f2937;'),
-            P(f"High: {stats['urgency'].get('high', 0):,}"),
-            P(f"Medium: {stats['urgency'].get('medium', 0):,}"),
-            P(f"Low: {stats['urgency'].get('low', 0):,}"),
+            H1('Urgency Analysis & Prioritization', style='margin-bottom: 2rem; color: #1f2937;'),
+
+            # Summary cards
+            Div(
+                Div(
+                    H3(f"{stats['urgency'].get('high', 0):,}", style='font-size: 2.5rem; color: #ef4444;'),
+                    P('High Urgency'),
+                    P(f"{stats['urgency'].get('high', 0) / stats['total'] * 100:.1f}%", style='color: #ef4444;'),
+                    Strong('Needs immediate attention'),
+                    style='background: #fef2f2; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; border-left: 4px solid #ef4444;',
+                    cls='col-md-4'
+                ),
+                Div(
+                    H3(f"{stats['urgency'].get('medium', 0):,}", style='font-size: 2.5rem; color: #f59e0b;'),
+                    P('Medium Urgency'),
+                    P(f"{stats['urgency'].get('medium', 0) / stats['total'] * 100:.1f}%", style='color: #f59e0b;'),
+                    Strong('Schedule within 24-48h'),
+                    style='background: #fffbeb; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; border-left: 4px solid #f59e0b;',
+                    cls='col-md-4'
+                ),
+                Div(
+                    H3(f"{stats['urgency'].get('low', 0):,}", style='font-size: 2.5rem; color: #22c55e;'),
+                    P('Low Urgency'),
+                    P(f"{stats['urgency'].get('low', 0) / stats['total'] * 100:.1f}%", style='color: #22c55e;'),
+                    Strong('Can be queued'),
+                    style='background: #f0fdf4; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; border-left: 4px solid #22c55e;',
+                    cls='col-md-4'
+                ),
+                cls='row g-4 mb-4'
+            ),
+
+            # Critical requests (high urgency + negative)
+            Div(
+                H3('🚨 CRITICAL: High Urgency + Negative Sentiment', style='color: #dc2626; margin-bottom: 1.5rem;'),
+                P(f'{len(critical)} requests need immediate attention', style='color: #ef4444; font-weight: 600; margin-bottom: 1rem;'),
+                Table(
+                    Thead(Tr(Th('ID'), Th('Service'), Th('Description'))),
+                    Tbody(
+                        *[
+                            Tr(
+                                Td(row['service_request_id'], style='font-weight: 600;'),
+                                Td(str(row['service_name'])[:30]),
+                                Td(str(row['description'])[:100] + '...' if len(str(row['description'])) > 100 else row['description'])
+                            )
+                            for _, row in critical.iterrows()
+                        ] if len(critical) > 0 else [Tr(Td('No critical requests', colspan='3', style='color: #22c55e;'))]
+                    ),
+                    cls='table table-striped'
+                ),
+                style='background: #fef2f2; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 2px solid #ef4444; margin-bottom: 2rem;'
+            ),
+
+            # Urgency by service type
+            Div(
+                H3('Urgency Distribution by Service Type', style='color: #1f2937; margin-bottom: 1.5rem;'),
+                Table(
+                    Thead(Tr(Th('Service'), Th('Total'), Th('High'), Th('Medium'), Th('Low'), Th('% High'))),
+                    Tbody(*urgency_by_service),
+                    cls='table table-striped'
+                ),
+                style='background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;'
+            ),
+
+            # All high urgency requests
+            Div(
+                H3('⚠️ All High Urgency Requests', style='color: #ef4444; margin-bottom: 1.5rem;'),
+                Table(
+                    Thead(Tr(Th('ID'), Th('Service'), Th('Description'), Th('Sentiment'), Th('Score'))),
+                    Tbody(
+                        *[
+                            Tr(
+                                Td(row['service_request_id']),
+                                Td(str(row['service_name'])[:30]),
+                                Td(str(row['description'])[:80] + '...' if len(str(row['description'])) > 80 else row['description']),
+                                Td(Span(row['sentiment'], style=f"color: {'#ef4444' if row['sentiment'] == 'negative' else '#6b7280'}; font-weight: 600;")),
+                                Td(str(row['urgency_score']), style='font-weight: 600;')
+                            )
+                            for _, row in high_urgency.iterrows()
+                        ]
+                    ),
+                    cls='table table-striped'
+                ),
+                style='background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'
+            ),
+
             cls='container-fluid px-4'
         )
     )
