@@ -11,8 +11,8 @@ import plotly.graph_objects as go
 import plotly.express as px
 from pathlib import Path
 import os
-from anthropic import Anthropic
 from datetime import datetime
+import requests
 
 # ============================================================================
 # CONFIGURATION
@@ -35,14 +35,14 @@ with open(JSON_PATH, 'r') as f:
 
 print(f"Loaded {len(df):,} service requests")
 
-# Initialize Anthropic client for chat
-try:
-    anthropic_client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+# Initialize OpenRouter for chat
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+if OPENROUTER_API_KEY:
     CHAT_ENABLED = True
-except Exception as e:
-    print(f"Warning: Anthropic API not available: {e}")
-    anthropic_client = None
+    print("✅ OpenRouter API key found - chat enabled")
+else:
     CHAT_ENABLED = False
+    print("⚠️  OpenRouter API key not found - chat disabled")
 
 # ============================================================================
 # FASTHTML APP SETUP
@@ -1197,7 +1197,7 @@ def get():
             create_nav('chat'),
             Div(
                 H2("Chat Assistant Unavailable", cls="text-center mb-4"),
-                P("The chat assistant requires an Anthropic API key to be configured.",
+                P("The chat assistant requires an OpenRouter API key to be configured.",
                   cls="text-center text-muted"),
                 P("Please contact the administrator to enable this feature.",
                   cls="text-center text-muted"),
@@ -1308,20 +1308,36 @@ def post(message: str):
         style="display: flex; flex-direction: column; align-items: flex-end;"
     )
 
-    # Call Claude API
+    # Call OpenRouter API (Claude Sonnet 4.5 via OpenRouter)
     try:
-        response = anthropic_client.messages.create(
-            model="claude-sonnet-4-5-20250929",
-            max_tokens=1024,
-            temperature=0.7,
-            system=CHAT_CONTEXT,
-            messages=[
-                {"role": "user", "content": message}
-            ]
+        response = requests.post(
+            url="https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                "Content-Type": "application/json",
+                "HTTP-Referer": "https://louisville-311-dashboard.onrender.com",
+                "X-Title": "Louisville 311 Dashboard"
+            },
+            json={
+                "model": "anthropic/claude-sonnet-4.5:beta",
+                "messages": [
+                    {"role": "system", "content": CHAT_CONTEXT},
+                    {"role": "user", "content": message}
+                ],
+                "max_tokens": 1024,
+                "temperature": 0.7
+            },
+            timeout=30
         )
 
-        assistant_text = response.content[0].text
+        if response.status_code == 200:
+            response_data = response.json()
+            assistant_text = response_data['choices'][0]['message']['content']
+        else:
+            assistant_text = f"I apologize, but I encountered an error (HTTP {response.status_code}). Please try again."
 
+    except requests.exceptions.Timeout:
+        assistant_text = "I apologize, but the request timed out. Please try again."
     except Exception as e:
         assistant_text = f"I apologize, but I encountered an error processing your question: {str(e)}"
 
