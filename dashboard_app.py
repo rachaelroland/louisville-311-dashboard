@@ -473,6 +473,49 @@ def get():
         call_center_stats
     )
 
+@rt('/topics')
+def get():
+    """Topics analysis page"""
+    return Title('Topics Analysis'), Main(
+        create_nav('topics'),
+        Div(
+            H1('Topic Analysis', style='margin-bottom: 2rem; color: #1f2937;'),
+            P('Topic modeling results from LDA and NMF analysis'),
+            P(f'Analyzing {len(df):,} service requests'),
+            cls='container-fluid px-4'
+        )
+    )
+
+@rt('/sentiment')
+def get():
+    """Sentiment analysis page"""
+    stats = get_summary_stats()
+    return Title('Sentiment Analysis'), Main(
+        create_nav('sentiment'),
+        Div(
+            H1('Sentiment Analysis', style='margin-bottom: 2rem; color: #1f2937;'),
+            P(f"Positive: {stats['sentiment'].get('positive', 0):,}"),
+            P(f"Negative: {stats['sentiment'].get('negative', 0):,}"),
+            P(f"Neutral: {stats['sentiment'].get('neutral', 0):,}"),
+            cls='container-fluid px-4'
+        )
+    )
+
+@rt('/urgency')
+def get():
+    """Urgency analysis page"""
+    stats = get_summary_stats()
+    return Title('Urgency Analysis'), Main(
+        create_nav('urgency'),
+        Div(
+            H1('Urgency Distribution', style='margin-bottom: 2rem; color: #1f2937;'),
+            P(f"High: {stats['urgency'].get('high', 0):,}"),
+            P(f"Medium: {stats['urgency'].get('medium', 0):,}"),
+            P(f"Low: {stats['urgency'].get('low', 0):,}"),
+            cls='container-fluid px-4'
+        )
+    )
+
 @rt('/business')
 def get():
     """Business opportunities page"""
@@ -494,9 +537,7 @@ def get():
                         cls='col-md-4 text-center'
                     ),
                     Div(
-                        Div(
-                            style='font-size: 4rem; color: #2193b0;',
-                        ).children('→'),
+                        P('→', style='font-size: 4rem; color: #2193b0; margin: 0;'),
                         style='display: flex; align-items: center; justify-content: center;',
                         cls='col-md-1'
                     ),
