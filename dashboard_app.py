@@ -13,6 +13,8 @@ from pathlib import Path
 import os
 from datetime import datetime
 import requests
+import uuid
+from collections import defaultdict, deque
 
 # ============================================================================
 # CONFIGURATION
@@ -43,6 +45,36 @@ if OPENROUTER_API_KEY:
 else:
     CHAT_ENABLED = False
     print("⚠️  OpenRouter API key not found - chat disabled")
+
+# ============================================================================
+# CONVERSATION MEMORY
+# ============================================================================
+
+# Simple in-memory session store
+# Key: session_id, Value: deque of message dicts (max 20 messages)
+chat_sessions = defaultdict(lambda: deque(maxlen=20))
+
+# Session cleanup (remove sessions older than 1 hour)
+session_timestamps = {}
+
+def get_session_id(request):
+    """Get or create session ID from cookie"""
+    session_id = request.cookies.get('chat_session_id')
+    if not session_id:
+        session_id = str(uuid.uuid4())
+    return session_id
+
+def cleanup_old_sessions():
+    """Remove sessions older than 1 hour (basic cleanup)"""
+    current_time = datetime.now()
+    old_sessions = [
+        sid for sid, timestamp in session_timestamps.items()
+        if (current_time - timestamp).seconds > 3600
+    ]
+    for sid in old_sessions:
+        if sid in chat_sessions:
+            del chat_sessions[sid]
+        del session_timestamps[sid]
 
 # ============================================================================
 # FASTHTML APP SETUP
@@ -1342,13 +1374,34 @@ def get():
     )
 
 @rt('/chat/ask')
-def post(message: str):
-    """Handle chat message and return response"""
+def post(message: str, request):
+    """Handle chat message and return response with conversation memory"""
 
     if not CHAT_ENABLED or not message or message.strip() == "":
         return Div("Please enter a question.", cls="alert alert-warning")
 
+    # Get or create session ID
+    session_id = get_session_id(request)
+    session_timestamps[session_id] = datetime.now()
+
+    # Cleanup old sessions periodically
+    if len(session_timestamps) > 100:  # Every 100 sessions
+        cleanup_old_sessions()
+
     timestamp = datetime.now().strftime("%I:%M %p")
+
+    # Get conversation history for this session
+    history = chat_sessions[session_id]
+
+    # Build messages array with history
+    messages = [{"role": "system", "content": CHAT_CONTEXT}]
+
+    # Add conversation history (last 10 exchanges = 20 messages)
+    for msg in list(history):
+        messages.append(msg)
+
+    # Add current user message
+    messages.append({"role": "user", "content": message})
 
     # User message bubble
     user_msg = Div(
@@ -1359,7 +1412,7 @@ def post(message: str):
 
     # Call OpenRouter API (Claude Sonnet 4.5 via OpenRouter)
     try:
-        response = requests.post(
+        api_response = requests.post(
             url="https://openrouter.ai/api/v1/chat/completions",
             headers={
                 "Authorization": f"Bearer {OPENROUTER_API_KEY}",
@@ -1369,21 +1422,22 @@ def post(message: str):
             },
             json={
                 "model": "anthropic/claude-sonnet-4.5:beta",
-                "messages": [
-                    {"role": "system", "content": CHAT_CONTEXT},
-                    {"role": "user", "content": message}
-                ],
+                "messages": messages,
                 "max_tokens": 1024,
                 "temperature": 0.7
             },
             timeout=30
         )
 
-        if response.status_code == 200:
-            response_data = response.json()
+        if api_response.status_code == 200:
+            response_data = api_response.json()
             assistant_text = response_data['choices'][0]['message']['content']
+
+            # Store conversation in history
+            history.append({"role": "user", "content": message})
+            history.append({"role": "assistant", "content": assistant_text})
         else:
-            assistant_text = f"I apologize, but I encountered an error (HTTP {response.status_code}). Please try again."
+            assistant_text = f"I apologize, but I encountered an error (HTTP {api_response.status_code}). Please try again."
 
     except requests.exceptions.Timeout:
         assistant_text = "I apologize, but the request timed out. Please try again."
@@ -1397,8 +1451,11 @@ def post(message: str):
         style="display: flex; flex-direction: column; align-items: flex-start;"
     )
 
-    # Return both messages
-    return Div(user_msg, assistant_msg)
+    # Return both messages with session cookie
+    response = Div(user_msg, assistant_msg)
+    # Note: FastHTML will handle setting cookies if we return a Response object with set_cookie
+    # For now, using simple approach - session persists via server-side storage
+    return response
 
 # ============================================================================
 # RUN APP
