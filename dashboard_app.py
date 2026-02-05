@@ -28,6 +28,7 @@ if not CSV_PATH.exists():
     # Fallback to full dataset if available locally
     CSV_PATH = Path("/Users/rachael/Documents/projects/rachaelroland/pipelines/pipelines/311/data/processed/311_processed_with_nlp.csv")
 JSON_PATH = CURRENT_DIR / "311_nlp_results.json"
+FEEDBACK_PATH = CURRENT_DIR / "chat_feedback.json"
 
 # Load data on startup
 print("Loading 311 NLP data...")
@@ -57,12 +58,65 @@ chat_sessions = defaultdict(lambda: deque(maxlen=20))
 # Session cleanup (remove sessions older than 1 hour)
 session_timestamps = {}
 
+# Rate limiting
+# Key: session_id, Value: count of questions asked
+session_question_counts = defaultdict(int)
+
+# Key: IP address, Value: list of timestamps for questions
+ip_question_timestamps = defaultdict(list)
+
+# Rate limits
+MAX_QUESTIONS_PER_SESSION = 20
+MAX_QUESTIONS_PER_IP_PER_HOUR = 50
+
 def get_session_id(request):
     """Get or create session ID from cookie"""
     session_id = request.cookies.get('chat_session_id')
     if not session_id:
         session_id = str(uuid.uuid4())
     return session_id
+
+def get_client_ip(request):
+    """Get client IP address from request"""
+    # Check for forwarded IP (when behind proxy/load balancer)
+    forwarded = request.headers.get('X-Forwarded-For')
+    if forwarded:
+        return forwarded.split(',')[0].strip()
+    return request.client.host if hasattr(request, 'client') else '127.0.0.1'
+
+def check_rate_limit(session_id: str, ip_address: str):
+    """
+    Check if user has exceeded rate limits
+    Returns: (is_allowed: bool, remaining_questions: int, error_message: str)
+    """
+    current_time = datetime.now()
+
+    # Check session-based limit (20 questions per session)
+    session_count = session_question_counts[session_id]
+    if session_count >= MAX_QUESTIONS_PER_SESSION:
+        return False, 0, f"You've reached the limit of {MAX_QUESTIONS_PER_SESSION} questions per session. Please clear your chat to start a new session."
+
+    # Check IP-based limit (50 questions per hour)
+    # Remove timestamps older than 1 hour
+    timestamps = ip_question_timestamps[ip_address]
+    recent_timestamps = [ts for ts in timestamps if (current_time - ts).seconds < 3600]
+    ip_question_timestamps[ip_address] = recent_timestamps
+
+    if len(recent_timestamps) >= MAX_QUESTIONS_PER_IP_PER_HOUR:
+        return False, 0, f"You've reached the limit of {MAX_QUESTIONS_PER_IP_PER_HOUR} questions per hour. Please try again later."
+
+    # Calculate remaining questions
+    remaining = min(
+        MAX_QUESTIONS_PER_SESSION - session_count,
+        MAX_QUESTIONS_PER_IP_PER_HOUR - len(recent_timestamps)
+    )
+
+    return True, remaining, ""
+
+def increment_rate_limit(session_id: str, ip_address: str):
+    """Increment rate limit counters after a successful question"""
+    session_question_counts[session_id] += 1
+    ip_question_timestamps[ip_address].append(datetime.now())
 
 def cleanup_old_sessions():
     """Remove sessions older than 1 hour (basic cleanup)"""
@@ -75,6 +129,69 @@ def cleanup_old_sessions():
         if sid in chat_sessions:
             del chat_sessions[sid]
         del session_timestamps[sid]
+        if sid in session_question_counts:
+            del session_question_counts[sid]
+
+def generate_follow_up_questions(user_question: str):
+    """
+    Generate contextual follow-up questions based on keywords in the user's question
+    Returns a list of 2-3 follow-up question strings
+    """
+    question_lower = user_question.lower()
+
+    # Keyword-based follow-up generation
+    follow_ups = []
+
+    # Service type related questions
+    if any(word in question_lower for word in ['service', 'type', 'top', 'most', 'common']):
+        follow_ups.extend([
+            "What's the sentiment breakdown for the top service types?",
+            "Which service types have the highest urgency?",
+            "How do service types compare in volume?"
+        ])
+
+    # Sentiment related questions
+    if any(word in question_lower for word in ['sentiment', 'negative', 'positive', 'neutral']):
+        follow_ups.extend([
+            "Which service types have the worst sentiment?",
+            "What are the most negative requests about?",
+            "How does sentiment correlate with urgency?"
+        ])
+
+    # Urgency related questions
+    if any(word in question_lower for word in ['urgency', 'urgent', 'high', 'critical', 'priority']):
+        follow_ups.extend([
+            "What's causing the high urgency requests?",
+            "How many critical issues need immediate attention?",
+            "Which service types are most urgent?"
+        ])
+
+    # Business/savings related questions
+    if any(word in question_lower for word in ['save', 'cost', 'money', 'business', 'opportunity']):
+        follow_ups.extend([
+            "What are the top cost-saving opportunities?",
+            "Which issues would provide the highest ROI?",
+            "Tell me about call center efficiency improvements"
+        ])
+
+    # Call center related questions
+    if any(word in question_lower for word in ['call', 'center', 'bottleneck', 'efficiency']):
+        follow_ups.extend([
+            "What are the main call center bottlenecks?",
+            "How can we reduce call volume?",
+            "Which issues take the longest to resolve?"
+        ])
+
+    # If no specific keywords matched, provide general follow-ups
+    if not follow_ups:
+        follow_ups = [
+            "What are the critical issues right now?",
+            "Show me sentiment and urgency breakdown",
+            "What business opportunities exist?"
+        ]
+
+    # Return up to 3 unique follow-ups
+    return list(dict.fromkeys(follow_ups))[:3]
 
 # ============================================================================
 # FASTHTML APP SETUP
@@ -142,6 +259,96 @@ app, rt = fast_app(
                 background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
                 border-radius: 8px;
                 border: 1px solid #0ea5e9;
+            }
+            .typing-indicator {
+                display: none;
+                padding: 0.75rem 1rem;
+                margin-bottom: 1rem;
+                background: #f3f4f6;
+                border-left: 4px solid #2193b0;
+                border-radius: 8px;
+                max-width: 75%;
+                color: #6b7280;
+                font-style: italic;
+            }
+            .typing-indicator.htmx-request {
+                display: block;
+            }
+            .typing-dots {
+                display: inline-block;
+            }
+            .typing-dots::after {
+                content: '...';
+                animation: dots 1.5s steps(4, end) infinite;
+            }
+            @keyframes dots {
+                0%, 20% { content: '.'; }
+                40% { content: '..'; }
+                60%, 100% { content: '...'; }
+            }
+            .feedback-buttons {
+                margin-top: 0.5rem;
+                display: flex;
+                gap: 0.5rem;
+            }
+            .feedback-btn {
+                background: none;
+                border: 1px solid #d1d5db;
+                border-radius: 4px;
+                padding: 0.25rem 0.5rem;
+                cursor: pointer;
+                font-size: 1rem;
+                transition: all 0.2s;
+            }
+            .feedback-btn:hover {
+                background: #f3f4f6;
+                border-color: #9ca3af;
+            }
+            .feedback-btn.selected {
+                background: #e0f2fe;
+                border-color: #0ea5e9;
+            }
+            .feedback-message {
+                font-size: 0.75rem;
+                color: #6b7280;
+                font-style: italic;
+                margin-top: 0.25rem;
+            }
+            .follow-up-questions {
+                margin-top: 1rem;
+                padding: 0.75rem;
+                background: #f9fafb;
+                border-radius: 6px;
+                border: 1px solid #e5e7eb;
+                max-width: 75%;
+            }
+            .follow-up-label {
+                font-size: 0.85rem;
+                color: #6b7280;
+                font-weight: 500;
+                margin-bottom: 0.5rem;
+            }
+            .follow-up-btn {
+                display: block;
+                width: 100%;
+                text-align: left;
+                background: white;
+                border: 1px solid #d1d5db;
+                border-radius: 4px;
+                padding: 0.5rem 0.75rem;
+                margin-bottom: 0.5rem;
+                cursor: pointer;
+                font-size: 0.9rem;
+                color: #374151;
+                transition: all 0.2s;
+            }
+            .follow-up-btn:hover {
+                background: #f3f4f6;
+                border-color: #2193b0;
+                color: #2193b0;
+            }
+            .follow-up-btn:last-child {
+                margin-bottom: 0;
             }
         """)
     )
@@ -1298,9 +1505,33 @@ def get():
     return Title("311 Chat Assistant"), Main(
         create_nav('chat'),
 
-        # Welcome section
+        # Welcome section with Clear Chat button
         Div(
-            H2("💬 Ask Me Anything About 311 Data", cls="mb-3", style="color: #2193b0;"),
+            Div(
+                Div(
+                    H2("💬 Ask Me Anything About 311 Data", cls="mb-0", style="color: #2193b0;"),
+                    cls="col"
+                ),
+                Div(
+                    Button(
+                        "💾 Export",
+                        cls="btn btn-outline-primary btn-sm me-2",
+                        onclick="window.location.href='/chat/export'",
+                        style="white-space: nowrap;"
+                    ),
+                    Button(
+                        "🗑️ Clear Chat",
+                        cls="btn btn-outline-danger btn-sm",
+                        hx_post="/chat/clear",
+                        hx_target="#chat-history",
+                        hx_swap="innerHTML",
+                        hx_confirm="Are you sure you want to clear the conversation history?",
+                        style="white-space: nowrap;"
+                    ),
+                    cls="col-auto"
+                ),
+                cls="row align-items-center mb-3"
+            ),
             P(
                 f"I have information about {len(df):,} service requests from 2024. "
                 "Ask questions in plain English and I'll provide insights based on the data.",
@@ -1325,6 +1556,7 @@ def get():
                     hx_vals=f'{{"message": "{q}"}}',
                     hx_target="#chat-history",
                     hx_swap="beforeend",
+                    hx_indicator="#typing-indicator",
                     onclick="document.querySelector('.chat-container').scrollTop = document.querySelector('.chat-container').scrollHeight;"
                 )
                 for q in quick_questions
@@ -1341,6 +1573,14 @@ def get():
             ),
             id="chat-history",
             cls="chat-container"
+        ),
+
+        # Typing indicator
+        Div(
+            "Assistant is typing",
+            Span(cls="typing-dots"),
+            id="typing-indicator",
+            cls="typing-indicator"
         ),
 
         # Chat input form
@@ -1366,12 +1606,94 @@ def get():
             hx_post="/chat/ask",
             hx_target="#chat-history",
             hx_swap="beforeend",
+            hx_indicator="#typing-indicator",
             hx_on_htmx_after_request="this.reset(); document.querySelector('.chat-container').scrollTop = document.querySelector('.chat-container').scrollHeight;",
             cls="chat-input-form"
         ),
 
         cls='container-fluid px-4'
     )
+
+@rt('/chat/clear')
+def post(request):
+    """Clear chat history for the current session"""
+    session_id = get_session_id(request)
+
+    # Clear the session history and question count
+    if session_id in chat_sessions:
+        chat_sessions[session_id].clear()
+    if session_id in session_question_counts:
+        session_question_counts[session_id] = 0
+
+    # Return initial greeting message
+    return Div(
+        "👋 Hello! I'm your 311 data assistant. Ask me anything about the service requests!",
+        cls="message assistant-message",
+        style="display: inline-block;"
+    )
+
+@rt('/chat/export')
+def get(request):
+    """Export chat transcript as markdown file"""
+    from starlette.responses import Response
+
+    session_id = get_session_id(request)
+    history = chat_sessions.get(session_id, deque())
+
+    # Generate markdown transcript
+    timestamp = datetime.now().strftime("%B %d, %Y at %I:%M %p")
+    transcript = f"# Louisville 311 Chat Transcript\n\n"
+    transcript += f"**Generated:** {timestamp}\n\n"
+    transcript += "---\n\n"
+
+    if not history:
+        transcript += "*No conversation history to export.*\n"
+    else:
+        for i, msg in enumerate(history, 1):
+            role = "User" if msg['role'] == 'user' else "Assistant"
+            content = msg['content']
+            transcript += f"### {role}\n\n{content}\n\n"
+            transcript += "---\n\n"
+
+    # Return as downloadable file
+    filename = f"311_chat_transcript_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+    return Response(
+        content=transcript,
+        media_type="text/markdown",
+        headers={
+            "Content-Disposition": f"attachment; filename={filename}"
+        }
+    )
+
+@rt('/chat/feedback')
+def post(message_id: str, feedback: str):
+    """Handle feedback for a chat message"""
+    try:
+        # Load existing feedback
+        if FEEDBACK_PATH.exists():
+            with open(FEEDBACK_PATH, 'r') as f:
+                feedback_data = json.load(f)
+        else:
+            feedback_data = []
+
+        # Add new feedback
+        feedback_data.append({
+            'message_id': message_id,
+            'feedback': feedback,
+            'timestamp': datetime.now().isoformat()
+        })
+
+        # Save feedback
+        with open(FEEDBACK_PATH, 'w') as f:
+            json.dump(feedback_data, f, indent=2)
+
+        # Return success message
+        if feedback == 'positive':
+            return Span("Thanks for the feedback! 👍", cls="feedback-message")
+        else:
+            return Span("Thanks for the feedback. We'll work on improving! 👎", cls="feedback-message")
+    except Exception as e:
+        return Span("Error saving feedback", cls="feedback-message")
 
 @rt('/chat/ask')
 def post(message: str, request):
@@ -1380,9 +1702,23 @@ def post(message: str, request):
     if not CHAT_ENABLED or not message or message.strip() == "":
         return Div("Please enter a question.", cls="alert alert-warning")
 
-    # Get or create session ID
+    # Get or create session ID and client IP
     session_id = get_session_id(request)
+    ip_address = get_client_ip(request)
     session_timestamps[session_id] = datetime.now()
+
+    # Check rate limits
+    is_allowed, remaining, error_msg = check_rate_limit(session_id, ip_address)
+    if not is_allowed:
+        return Div(
+            Div(
+                "⚠️ Rate Limit Reached",
+                style="font-weight: bold; margin-bottom: 0.5rem;"
+            ),
+            Div(error_msg),
+            cls="alert alert-warning",
+            style="max-width: 75%; margin: 1rem 0;"
+        )
 
     # Cleanup old sessions periodically
     if len(session_timestamps) > 100:  # Every 100 sessions
@@ -1444,15 +1780,72 @@ def post(message: str, request):
     except Exception as e:
         assistant_text = f"I apologize, but I encountered an error processing your question: {str(e)}"
 
-    # Assistant message bubble
+    # Increment rate limit counters (successful question)
+    increment_rate_limit(session_id, ip_address)
+
+    # Calculate remaining questions after increment
+    _, remaining, _ = check_rate_limit(session_id, ip_address)
+
+    # Generate unique message ID for feedback tracking
+    message_id = str(uuid.uuid4())
+
+    # Generate follow-up questions based on user's question
+    follow_ups = generate_follow_up_questions(message)
+
+    # Assistant message bubble with feedback buttons
     assistant_msg = Div(
         Div(assistant_text, cls="message assistant-message"),
         Div(timestamp, cls="timestamp"),
+        Div(
+            Button(
+                "👍",
+                cls="feedback-btn",
+                hx_post="/chat/feedback",
+                hx_vals=f'{{"message_id": "{message_id}", "feedback": "positive"}}',
+                hx_target="closest div",
+                hx_swap="afterend",
+                title="Helpful response"
+            ),
+            Button(
+                "👎",
+                cls="feedback-btn",
+                hx_post="/chat/feedback",
+                hx_vals=f'{{"message_id": "{message_id}", "feedback": "negative"}}',
+                hx_target="closest div",
+                hx_swap="afterend",
+                title="Not helpful"
+            ),
+            cls="feedback-buttons"
+        ),
+        Div(
+            f"💬 {remaining} questions remaining",
+            cls="text-muted",
+            style="font-size: 0.75rem; margin-top: 0.25rem;"
+        ),
         style="display: flex; flex-direction: column; align-items: flex-start;"
     )
 
+    # Follow-up questions section
+    follow_up_section = Div(
+        Div("💡 You might also want to ask:", cls="follow-up-label"),
+        *[
+            Button(
+                q,
+                cls="follow-up-btn",
+                hx_post="/chat/ask",
+                hx_vals=f'{{"message": "{q}"}}',
+                hx_target="#chat-history",
+                hx_swap="beforeend",
+                hx_indicator="#typing-indicator",
+                onclick="document.querySelector('.chat-container').scrollTop = document.querySelector('.chat-container').scrollHeight;"
+            )
+            for q in follow_ups
+        ],
+        cls="follow-up-questions"
+    )
+
     # Return both messages with session cookie
-    response = Div(user_msg, assistant_msg)
+    response = Div(user_msg, assistant_msg, follow_up_section)
     # Note: FastHTML will handle setting cookies if we return a Response object with set_cookie
     # For now, using simple approach - session persists via server-side storage
     return response
