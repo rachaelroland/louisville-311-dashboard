@@ -1,0 +1,21 @@
+{
+  "type": "web_service",
+  "name": "louisville-311-dashboard",
+  "ownerId": "tea-cvnb4rq4d50c73807db0",
+  "repo": "https://github.com/rachaelroland/louisville-311-dashboard",
+  "autoDeploy": "yes",
+  "branch": "main",
+  "buildCommand": "pip install -r requirements.txt",
+  "startCommand": "python dashboard_app.py",
+  "envVars": [
+    {
+      "key": "PORT",
+      "value": "10000"
+    }
+  ],
+  "serviceDetails": {
+    "env": "python",
+    "region": "oregon",
+    "plan": "free"
+  }
+}

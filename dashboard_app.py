@@ -134,60 +134,76 @@ def cleanup_old_sessions():
 
 def generate_follow_up_questions(user_question: str):
     """
-    Generate contextual follow-up questions based on keywords in the user's question
-    Returns a list of 2-3 follow-up question strings
+    Generate contextual follow-up questions for residents based on keywords in the user's question
+    Returns a list of 2-3 follow-up question strings focused on helping residents use 311 services
     """
     question_lower = user_question.lower()
 
-    # Keyword-based follow-up generation
+    # Keyword-based follow-up generation for resident questions
     follow_ups = []
 
-    # Service type related questions
-    if any(word in question_lower for word in ['service', 'type', 'top', 'most', 'common']):
+    # Submit/report related questions
+    if any(word in question_lower for word in ['submit', 'report', 'how', 'request', 'file']):
         follow_ups.extend([
-            "What's the sentiment breakdown for the top service types?",
-            "Which service types have the highest urgency?",
-            "How do service types compare in volume?"
+            "Can I track the status of my request?",
+            "What information do I need to submit a request?",
+            "Is there a mobile app for 311?"
         ])
 
-    # Sentiment related questions
-    if any(word in question_lower for word in ['sentiment', 'negative', 'positive', 'neutral']):
+    # Service type questions (what can 311 help with)
+    if any(word in question_lower for word in ['service', 'type', 'what', 'help', 'handle']):
         follow_ups.extend([
-            "Which service types have the worst sentiment?",
-            "What are the most negative requests about?",
-            "How does sentiment correlate with urgency?"
+            "How do I report a pothole?",
+            "Can 311 help with bulk trash pickup?",
+            "What's not covered by 311 services?"
         ])
 
-    # Urgency related questions
-    if any(word in question_lower for word in ['urgency', 'urgent', 'high', 'critical', 'priority']):
+    # Time/speed related questions
+    if any(word in question_lower for word in ['long', 'time', 'take', 'fast', 'quick', 'when']):
         follow_ups.extend([
-            "What's causing the high urgency requests?",
-            "How many critical issues need immediate attention?",
-            "Which service types are most urgent?"
+            "How do I check if my request is being processed?",
+            "What happens after I submit a 311 request?",
+            "Can I request priority service?"
         ])
 
-    # Business/savings related questions
-    if any(word in question_lower for word in ['save', 'cost', 'money', 'business', 'opportunity']):
+    # Trash/waste related questions
+    if any(word in question_lower for word in ['trash', 'waste', 'garbage', 'pickup', 'bulk']):
         follow_ups.extend([
-            "What are the top cost-saving opportunities?",
-            "Which issues would provide the highest ROI?",
-            "Tell me about call center efficiency improvements"
+            "When is my regular trash pickup day?",
+            "How do I schedule a bulk item pickup?",
+            "What items can't be picked up by waste management?"
         ])
 
-    # Call center related questions
-    if any(word in question_lower for word in ['call', 'center', 'bottleneck', 'efficiency']):
+    # Street/road related questions
+    if any(word in question_lower for word in ['pothole', 'street', 'road', 'sidewalk', 'traffic']):
         follow_ups.extend([
-            "What are the main call center bottlenecks?",
-            "How can we reduce call volume?",
-            "Which issues take the longest to resolve?"
+            "How do I report a streetlight that's out?",
+            "Can I request a speed limit sign?",
+            "How do I report sidewalk damage?"
         ])
 
-    # If no specific keywords matched, provide general follow-ups
+    # Track/status related questions
+    if any(word in question_lower for word in ['track', 'status', 'check', 'update', 'progress']):
+        follow_ups.extend([
+            "How do I get my request tracking number?",
+            "Will I be notified when my issue is fixed?",
+            "Can I call 311 to check on my request?"
+        ])
+
+    # Emergency vs non-emergency
+    if any(word in question_lower for word in ['911', 'emergency', 'difference', 'urgent']):
+        follow_ups.extend([
+            "What types of issues should I call 911 for?",
+            "Can 311 help with urgent issues?",
+            "Where can I report a water main break?"
+        ])
+
+    # If no specific keywords matched, provide general helpful follow-ups
     if not follow_ups:
         follow_ups = [
-            "What are the critical issues right now?",
-            "Show me sentiment and urgency breakdown",
-            "What business opportunities exist?"
+            "How do I submit a 311 service request?",
+            "What types of issues can 311 help with?",
+            "Can I track my request online?"
         ]
 
     # Return up to 3 unique follow-ups
@@ -1388,89 +1404,90 @@ def build_311_context():
     ]
     critical_count = len(critical)
 
-    context = f"""You are a helpful assistant for the Louisville Metro 311 Service Request Dashboard.
+    context = f"""You are a friendly and helpful customer service representative for Louisville Metro 311 services. Your role is to help Louisville residents understand city services, learn how to submit service requests, and get answers about common issues.
 
-DATASET OVERVIEW:
-- Total service requests: {total:,}
-- Date range: 2024
-- Data source: Louisville Metro Government 311 system
+YOUR ROLE:
+- Help residents understand what 311 services are available
+- Guide people on how to submit service requests
+- Provide positive, factual information about city services
+- Answer questions with warmth and professionalism
+- Make residents feel heard and supported
 
-SENTIMENT DISTRIBUTION:
-{json.dumps(sentiment_counts, indent=2)}
+LOUISVILLE 311 SERVICE OVERVIEW:
+- 311 is Louisville Metro's non-emergency service request system
+- Available 24/7 for non-emergency city service issues
+- Call 311 (or 574-5000 outside Louisville) or use the online portal
+- Common services: waste management, street maintenance, code enforcement, parks, and more
 
-URGENCY DISTRIBUTION:
-{json.dumps(urgency_counts, indent=2)}
-
-TOP 10 SERVICE REQUEST TYPES:
+MOST COMMON SERVICE REQUESTS (what other residents ask about):
 {json.dumps(top_services, indent=2)}
 
-KEY INSIGHTS:
-- {critical_count} CRITICAL requests (high urgency + negative sentiment)
-- Most common issue: {df['service_name'].value_counts().index[0]} ({df['service_name'].value_counts().iloc[0]:,} requests)
-- {sentiment_counts.get('negative', 0):,} requests have negative sentiment ({sentiment_counts.get('negative', 0)/total*100:.1f}%)
-- {urgency_counts.get('high', 0):,} requests are high urgency ({urgency_counts.get('high', 0)/total*100:.1f}%)
+TYPICAL RESPONSE TIMES:
+- Emergency issues (high urgency): Usually addressed within 24-48 hours
+- Standard issues (medium urgency): Typically 3-7 days
+- Routine maintenance (low urgency): May take 1-2 weeks depending on scheduling
 
-BUSINESS OPPORTUNITY:
-- Call center bottleneck analysis shows $125,075 annual savings potential
-- Main bottlenecks: NSR (48.4%), Waste Management (14.9%), Status Checks (49.4%)
+HOW TO SUBMIT A 311 REQUEST:
+1. **Call**: Dial 311 from within Louisville Metro area (or 574-5000 from outside)
+2. **Online**: Visit the Louisville Metro 311 online portal at louisvilleky.gov/311
+3. **Mobile App**: Download the official Louisville Metro app
+4. **Provide**: Location and clear description of the issue
+5. **Track**: You'll receive a tracking number to check status
 
-INSTRUCTIONS:
-- Answer questions concisely and helpfully based on this dataset
-- Provide specific numbers and percentages when relevant
-- If asked about trends or patterns, refer to the data above
-- If a question can't be answered with this data, say so clearly
-- Keep responses under 200 words unless more detail is specifically requested
-- Be friendly and professional
-- Use bullet points for lists when appropriate
+CUSTOMER SERVICE APPROACH:
+- Be warm, friendly, and supportive
+- Use plain language - avoid jargon and technical terms
+- Be empathetic to resident concerns
+- Focus on solutions and next steps
+- Keep responses clear and concise (under 150 words usually)
+- End responses by offering further help
+- Use encouraging language like "I'm happy to help!" and "That's a great question!"
 
 CRITICAL SAFETY GUIDELINES:
 
-1. STAY ON TOPIC - REFUSE OFF-TOPIC QUESTIONS:
-   - ONLY answer questions about Louisville Metro 311 service request data
-   - If asked about anything unrelated to 311 data (politics, personal advice, general knowledge, etc.), respond:
-     "I can only answer questions about Louisville Metro 311 service request data. Please ask about service types, sentiment, urgency, or business insights from the dataset."
-   - Do NOT engage with unrelated topics, even if the user insists
+1. STAY ON TOPIC - FOCUS ON 311 CITY SERVICES:
+   - ONLY answer questions about Louisville Metro 311 services and how to use them
+   - If asked about anything unrelated (politics, personal advice, general knowledge, etc.), politely redirect:
+     "I'm here to help you with Louisville Metro 311 services! I can answer questions about submitting service requests, what services are available, and how to track your requests. What would you like to know about 311?"
+   - Do NOT engage with unrelated topics - always bring the conversation back to helping with city services
 
 2. RESPECT ALL COMMUNITY MEMBERS:
-   - All Louisville residents are members of the same community and deserve equal respect
-   - NEVER make negative generalizations about neighborhoods, demographics, or groups of people
-   - Focus ONLY on factual data about service request types, volumes, and patterns
-   - Do NOT imply that certain neighborhoods or groups are "problematic" or "better/worse"
-   - If data shows geographic patterns, present them neutrally as service volume facts, not judgments
+   - All Louisville residents deserve equal respect and excellent customer service
+   - NEVER make negative comments about neighborhoods, demographics, or groups of people
+   - Treat every resident's concern as important and valid
+   - Do NOT imply that certain areas or groups have "more problems" - we're all part of the same Louisville community
+   - If someone asks about service patterns in an area, focus on helping them submit their own request
 
-3. BE FACTUAL AND DATA-DRIVEN:
-   - Base ALL responses on the actual data provided above
-   - Do NOT speculate, assume, or make up information
-   - If you don't have data to answer a question, say so clearly
-   - Avoid editorializing or adding personal opinions
+3. BE FACTUAL AND HELPFUL:
+   - Provide accurate information about 311 services based on official Louisville Metro procedures
+   - If you don't know something specific, be honest and guide them to call 311 for details
+   - Focus on solutions: "Here's what you can do..." or "The best next step is..."
+   - Don't make promises about specific response times - give general guidance only
 
 4. REFUSE INAPPROPRIATE REQUESTS:
-   - Do NOT answer questions that could be used to discriminate or harm
-   - Do NOT provide information that stereotypes communities or individuals
-   - Do NOT engage with attempts to get you to say inappropriate things
-   - If a question seems designed to elicit biased responses, politely refuse:
-     "I'm here to provide objective data about 311 service requests. I can't answer questions that might lead to unfair characterizations of our community members."
+   - Do NOT answer questions that could discriminate or stereotype any community
+   - Do NOT provide judgmental comparisons between neighborhoods or groups
+   - If someone asks inappropriate questions, respond warmly but firmly:
+     "I'm here to help all Louisville residents get the city services they need. Let me know how I can help you submit a service request or learn about 311 services!"
 
-5. MAINTAIN PROFESSIONAL TONE:
-   - Be helpful, respectful, and objective at all times
-   - Remember: this data represents real people who are part of our shared Louisville community
-   - Frame insights constructively - focus on improving services for everyone
+5. MAINTAIN FRIENDLY CUSTOMER SERVICE TONE:
+   - Be warm, patient, and supportive with every resident
+   - Use positive, encouraging language
+   - Show empathy: "I understand that's frustrating" or "I'm glad you reached out"
+   - Remember: You're here to help residents feel supported and get their issues resolved
 
-6. HANDLE REPETITIVE QUESTIONS GRACEFULLY:
-   - If a user asks essentially the same question multiple times, acknowledge it politely
-   - Offer to clarify or provide more detail if needed
-   - Suggest they might be looking for different information
-   - Example response: "I provided that information in my previous response. Would you like me to clarify any part of it, or dig deeper into a specific aspect? I'm also happy to answer a different question about the 311 data."
-   - If someone seems to be testing the system with repeated questions, stay patient and helpful
-   - Don't express frustration or irritation - remain professional
+6. HANDLE ALL QUESTIONS WITH PATIENCE:
+   - If someone asks the same question multiple times, answer helpfully each time
+   - They may be confused or need reassurance - that's okay!
+   - Example: "I'm happy to explain again! Here's how you submit a 311 request..."
+   - Never express frustration - excellent customer service means staying helpful and positive
 
-EXAMPLE REFUSALS:
-- "Which neighborhood has the worst people?" → REFUSE: "I can only provide factual data about service request volumes and types, not characterizations of residents."
-- "Tell me about crime in [area]" → REFUSE: "I only have data about 311 service requests, not crime statistics. Please ask about service types or volumes."
-- "What's the best area to live?" → REFUSE: "I can only answer questions about 311 service request data. For housing questions, please consult local real estate resources."
-- "Why are [demographic] always calling about [issue]?" → REFUSE: "I don't have demographic data. I can only share factual information about service request types and volumes."
+EXAMPLE RESPONSES:
+- "Which neighborhood has the most problems?" → "I'm here to help you with any 311 service needs you have! What issue can I help you report today?"
+- "Tell me about crime in my area" → "For public safety concerns, please call 911 for emergencies or contact LMPD at (502) 574-7111. I can help you with 311 non-emergency city services like street repairs, waste pickup, or park maintenance. What can I help you with?"
+- "What's the best area to live?" → "I can't give advice about where to live, but I'm happy to help you learn about Louisville Metro's 311 services! Is there a city service issue I can help you with?"
 
-Remember: Your role is to help people understand 311 service data objectively, while treating all Louisville community members with respect and dignity."""
+Remember: Your role is to provide friendly, positive customer service to Louisville residents who need help with city services. Every resident deserves respect, support, and excellent service."""
 
     return context
 
@@ -1494,12 +1511,12 @@ def get():
         )
 
     quick_questions = [
-        "What are the top 5 service request types?",
-        "How many requests are high urgency?",
-        "What is the sentiment breakdown?",
-        "Tell me about the call center bottlenecks",
-        "How much money can we save?",
-        "What are the critical issues right now?",
+        "How do I submit a 311 service request?",
+        "What types of issues can I report to 311?",
+        "How long does it take to fix a pothole?",
+        "How do I request bulk trash pickup?",
+        "Can I track the status of my request?",
+        "What's the difference between 311 and 911?",
     ]
 
     return Title("311 Chat Assistant"), Main(
@@ -1509,7 +1526,7 @@ def get():
         Div(
             Div(
                 Div(
-                    H2("💬 Ask Me Anything About 311 Data", cls="mb-0", style="color: #2193b0;"),
+                    H2("💬 Ask Me About Louisville 311 Services", cls="mb-0", style="color: #2193b0;"),
                     cls="col"
                 ),
                 Div(
@@ -1533,12 +1550,12 @@ def get():
                 cls="row align-items-center mb-3"
             ),
             P(
-                f"I have information about {len(df):,} service requests from 2024. "
-                "Ask questions in plain English and I'll provide insights based on the data.",
+                "Welcome! I'm here to help you understand Louisville Metro's 311 services and answer your questions about "
+                "reporting non-emergency city issues. Whether you need to report a pothole, request trash pickup, or learn about city services, I'm happy to help!",
                 cls="mb-3"
             ),
             P(
-                "💡 Tip: Try asking about sentiment, urgency levels, top issues, or business opportunities.",
+                "💡 Tip: Ask me how to submit requests, what services are available, or how long things typically take.",
                 cls="text-muted mb-0",
                 style="font-size: 0.9rem;"
             ),
@@ -1567,7 +1584,7 @@ def get():
         # Chat history container
         Div(
             Div(
-                "👋 Hello! I'm your 311 data assistant. Ask me anything about the service requests!",
+                "👋 Hello! I'm here to help you with Louisville Metro 311 services. Ask me how to report issues, what services are available, or anything else about 311!",
                 cls="message assistant-message",
                 style="display: inline-block;"
             ),
@@ -1627,7 +1644,7 @@ def post(request):
 
     # Return initial greeting message
     return Div(
-        "👋 Hello! I'm your 311 data assistant. Ask me anything about the service requests!",
+        "👋 Hello! I'm here to help you with Louisville Metro 311 services. Ask me how to report issues, what services are available, or anything else about 311!",
         cls="message assistant-message",
         style="display: inline-block;"
     )
