@@ -1,11 +1,16 @@
 # CLAUDE.md - Louisville Metro 311 NLP Analysis Project
 
-## 🔄 Latest Session State (Feb 1, 2026)
+## 🔄 Latest Session State (Feb 9, 2026)
 
 **READ THIS FIRST:** This is the complete context for the Louisville Metro 311 NLP analysis project.
 
-**Status:** Analysis complete ✅ | Reports delivered ✅ | Dashboard built ✅
-**Next:** Deploy dashboard or continue with geographic heat maps
+**Status:** Analysis complete ✅ | Reports delivered ✅ | Dashboard deployed ✅ | B2C transformation complete ✅
+
+**IMPORTANT - PROJECT LOCATION:**
+```
+/Users/rachael/Documents/projects/rachaelroland/pipelines/pipelines/311/dashboard/
+```
+⚠️ **Always use this local directory path - files have been moved from Downloads**
 
 **Quick Summary:**
 - Dataset: 169,598 Louisville Metro 311 service requests (2024)
@@ -13,6 +18,8 @@
 - Analysis: Sentiment, urgency, NER, topics, ABSA (aspect-based sentiment)
 - Deliverables: Technical report, business opportunities report, interactive dashboard
 - Key Finding: Call center can save $125K/year by automating 56.3% of requests
+- Dashboard: Deployed at https://louisville-311-dashboard.onrender.com
+- Chat Agent: Transformed to B2C customer service for Louisville residents
 
 ---
 
@@ -37,27 +44,30 @@
 
 ## Current Status (Updated Feb 1, 2026 - 10:00 AM MT)
 
-### ✅ INTERACTIVE DASHBOARD COMPLETE (Feb 1, 2026)
-**Status:** FastHTML web application ready for deployment
-**Location:** `/Users/rachael/Downloads/311_nlp_analysis_report/dashboard_app.py`
+### ✅ INTERACTIVE DASHBOARD DEPLOYED (Feb 9, 2026)
+**Status:** FastHTML web application deployed and transformed to B2C customer service
+**Location:** `/Users/rachael/Documents/projects/rachaelroland/pipelines/pipelines/311/dashboard/`
+**Live URL:** https://louisville-311-dashboard.onrender.com
 
 **Features:**
-- ✅ **Overview page** - Sentiment pie, urgency bar, top services, topics
-- ✅ **Call Center Analysis** - Bottleneck breakdown with solutions
-- ✅ **Business Opportunities** - ROI projections ($125K savings)
+- ✅ **7 Interactive Tabs** - Overview, Call Center, Topics, Sentiment, Urgency, Business Opportunities, Chat
+- ✅ **B2C Chat Agent** - Customer service for Louisville residents (not analytics)
+- ✅ **Chat Enhancements** - Memory, rate limiting, feedback, export, follow-up questions
 - ✅ **Interactive Plotly charts** - Hover, zoom, download
 - ✅ **Bootstrap 5 styling** - Professional gradient design
-- ✅ **One-click launcher** - `start_dashboard.sh` script
+- ✅ **OpenRouter API** - Claude Sonnet 4.5 integration
+- ✅ **Comprehensive tests** - 43 passing tests with pytest
 
 **Tech Stack:**
-- FastHTML (same framework as Zendesk annotation app)
+- FastHTML (Python web framework)
 - Plotly for interactive visualizations
 - Pandas for data processing
 - Bootstrap 5 for responsive UI
+- Claude Sonnet 4.5 via OpenRouter for chat
 
 **Quick Start:**
 ```bash
-cd /Users/rachael/Downloads/311_nlp_analysis_report
+cd /Users/rachael/Documents/projects/rachaelroland/pipelines/pipelines/311/dashboard
 ./start_dashboard.sh
 # Visit http://localhost:5002
 ```
@@ -65,14 +75,75 @@ cd /Users/rachael/Downloads/311_nlp_analysis_report
 **Pages:**
 1. `/` - Overview with key metrics and charts
 2. `/call-center` - Bottleneck analysis and automation opportunities
-3. `/business` - ROI analysis and strategic recommendations
-4. `/topics` - Topic modeling insights (placeholder)
-5. `/sentiment` - Sentiment deep dive (placeholder)
-6. `/urgency` - Urgency patterns (placeholder)
+3. `/topics` - Topic modeling insights
+4. `/sentiment` - Sentiment analysis deep dive
+5. `/urgency` - Urgency patterns and distribution
+6. `/business` - ROI analysis and strategic recommendations
+7. `/chat` - **B2C Customer service chat** for Louisville residents
+
+### ✅ B2C CUSTOMER SERVICE TRANSFORMATION (Feb 9, 2026)
+**Status:** Chat agent transformed from analytics to customer service
+**Commit:** `66f218c` + `471897b`
+**Documentation:** `docs/B2C_TRANSFORMATION.md`
+
+**What Changed:**
+- **Before:** Analytics assistant for city officials analyzing 311 data
+- **After:** Customer service rep helping Louisville residents use 311 services
+
+**Key Changes:**
+- System prompt rewritten for customer service role
+- Quick questions now resident-focused ("How do I submit a request?")
+- UI text addresses residents directly
+- Follow-up questions suggest actionable next steps
+- Warm, friendly, empathetic tone (not analytical)
+
+**Example Questions:**
+- "How do I submit a 311 service request?"
+- "What types of issues can I report to 311?"
+- "How long does it take to fix a pothole?"
+- "Can I track the status of my request?"
+- "What's the difference between 311 and 911?"
+
+**Safety Features Maintained:**
+- Rate limiting (20 questions/session, 50/hour)
+- Conversation memory (20 messages)
+- Respect for all community members
+- Refuses inappropriate questions warmly
+- Export transcripts, feedback buttons
+
+### ✅ FILE ORGANIZATION (Feb 9, 2026)
+**Status:** Project organized properly, Downloads folder archived
+
+**Old Location (REMOVED):**
+- ❌ `/Users/rachael/Downloads/311_nlp_analysis_report/`
+
+**New Location (USE THIS):**
+- ✅ `/Users/rachael/Documents/projects/rachaelroland/pipelines/pipelines/311/dashboard/`
+
+**Directory Structure:**
+```
+dashboard/
+├── dashboard_app.py           # Main application (81 KB, B2C transformed)
+├── sample_311_data.csv        # Sample dataset (8.6 MB, 9,337 requests)
+├── 311_nlp_results.json       # NLP analysis results
+├── requirements.txt           # Python dependencies
+├── render.yaml                # Render.com deployment config
+├── start_dashboard.sh         # Local startup script
+├── test_dashboard.py          # Test suite (43 tests)
+├── README.md                  # Comprehensive documentation
+├── docs/                      # All documentation
+│   ├── B2C_TRANSFORMATION.md # B2C transformation guide
+│   ├── CHAT_*.md             # Chat feature docs
+│   ├── DEPLOY.md             # Deployment guide
+│   ├── CLAUDE.md             # This file
+│   └── *.md                  # Other docs
+├── .git/                      # Git repository (full history)
+└── .venv/                     # Virtual environment
+```
 
 ### ✅ BUSINESS OPPORTUNITIES ANALYSIS COMPLETE (Feb 1, 2026)
 **Status:** Call center bottleneck analysis with ROI projections
-**Location:** `/Users/rachael/Downloads/311_nlp_analysis_report/`
+**Documentation:** `docs/BUSINESS_OPPORTUNITIES.md`
 
 **Key Findings:**
 
