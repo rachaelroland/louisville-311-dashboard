@@ -1,0 +1,44 @@
+# Claude Code Notes - Louisville 311 Dashboard
+
+## Project Location
+**ALWAYS USE THIS PATH:**
+/Users/rachael/Documents/projects/rachaelroland/pipelines/pipelines/311/dashboard/
+
+⚠️ Files have been moved from Downloads - Downloads folder has been archived
+
+## Quick Reference
+
+**Main app:** dashboard_app.py
+**Start locally:** ./start_dashboard.sh
+**Tests:** pytest test_dashboard.py -v
+**Docs:** docs/
+**Live URL:** https://louisville-311-dashboard.onrender.com
+
+## Recent Changes (Feb 9, 2026)
+
+1. ✅ B2C transformation - Chat agent now customer service focused
+2. ✅ File organization - All files moved from Downloads to proper location
+3. ✅ Documentation updated - See docs/B2C_TRANSFORMATION.md
+4. ✅ All changes committed and deployed
+
+## Key Files
+
+- dashboard_app.py - Main FastHTML application (B2C customer service)
+- sample_311_data.csv - Sample dataset (9,337 requests)
+- 311_nlp_results.json - NLP analysis results
+- requirements.txt - Python dependencies
+- render.yaml - Render.com deployment config
+- docs/CLAUDE.md - Comprehensive project context
+- docs/B2C_TRANSFORMATION.md - B2C transformation guide
+- README.md - Project documentation
+
+## Git Status
+
+Latest commits:
+- c0b12ba - Update CLAUDE.md with new location
+- 471897b - Add B2C transformation documentation
+- 66f218c - Transform chat agent to B2C + reorganize files
+- 05ebe3a - Add Phase 1 & 2 implementation docs
+- 3a2bb1a - Implement 6 major chat enhancements
+
+All changes pushed to GitHub main branch.
