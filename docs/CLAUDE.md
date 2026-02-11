@@ -111,6 +111,87 @@ cd /Users/rachael/Documents/projects/rachaelroland/pipelines/pipelines/311/dashb
 - Refuses inappropriate questions warmly
 - Export transcripts, feedback buttons
 
+### ✅ APPROVED QUESTIONS CORPUS (Feb 9, 2026)
+**Status:** Database schema created, initial 25+ questions loaded
+**Purpose:** Known Q&A pairs to improve chat agent responses
+**Documentation:** `migrations/20260209_create_311_approved_questions.sql`
+
+**Database Schema:**
+```sql
+-- Tables (l311_ prefix to avoid conflicts)
+- l311_approved_questions       -- Core Q&A corpus
+- l311_answer_feedback          -- Resident feedback (thumbs up/down)
+- l311_annotation_users         -- SME user management
+- l311_answer_annotations       -- SME quality review
+```
+
+**Question Categories (Initial Corpus: 25 Questions):**
+1. **General (5)** - What is 311, how to submit, tracking, timelines, 311 vs 911
+2. **Waste Management (5)** - Bulk pickup, schedules, missed pickup, recycling, yard waste
+3. **Street Maintenance (4)** - Potholes, streetlights, sidewalks, street signs
+4. **Code Enforcement (3)** - Property violations, abandoned vehicles, tall grass
+5. **Parks (2)** - Park maintenance, tree issues
+6. **Animal Control (2)** - Stray animals, barking dogs
+7. **Water/Sewer (2)** - Water main breaks, sewer backups
+
+**Question Structure:**
+```sql
+{
+    question_text: "How do I submit a 311 service request?",
+    answer_text: "There are three easy ways...",
+    category: "General",
+    subcategory: "Submitting Requests",
+    question_type: "how_to",  -- how_to, what_is, timeline, tracking, eligibility
+    keywords: ['submit', 'report', 'request'],
+    common_variations: ['How can I report...', 'How do I file...'],
+    typical_urgency: "low",
+    typical_response_time: "Immediate (information only)",
+    service_name: NULL  -- Links to 311 service types from data
+}
+```
+
+**Usage Stats Tracked:**
+- `times_shown` - How many times shown to residents
+- `times_helpful` - Thumbs up count
+- `times_not_helpful` - Thumbs down count
+- Calculated helpfulness percentage
+
+**Future Expansion:**
+- Add questions from actual chat usage patterns
+- SME validation of answer quality (annotations table ready)
+- Integration with chat agent for suggested responses
+- Answer versioning and A/B testing
+
+**Migration Files:**
+1. `20260209_create_311_approved_questions.sql` - Schema (4 tables, 3 views, triggers)
+2. `20260209_load_initial_311_questions.sql` - Initial 25 Q&A pairs
+
+**Sample Queries:**
+```sql
+-- Find questions by category
+SELECT question_text, answer_text
+FROM l311_approved_questions
+WHERE category = 'Waste Management' AND is_approved = true;
+
+-- Search by keywords
+SELECT question_text, answer_text
+FROM l311_approved_questions
+WHERE 'pothole' = ANY(keywords);
+
+-- View question stats
+SELECT * FROM v_l311_question_stats
+ORDER BY helpfulness_pct DESC LIMIT 10;
+
+-- Category performance
+SELECT * FROM v_l311_category_stats;
+```
+
+**Integration Plan:**
+- [ ] Phase 1: Load database on production (Supabase or local PostgreSQL)
+- [ ] Phase 2: Update chat agent to reference approved questions
+- [ ] Phase 3: Track usage and feedback via dashboard
+- [ ] Phase 4: SME annotation interface for answer quality review
+
 ### ✅ FILE ORGANIZATION (Feb 9, 2026)
 **Status:** Project organized properly, Downloads folder archived
 
