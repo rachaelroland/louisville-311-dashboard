@@ -1,0 +1,1028 @@
+{
+  "metadata": {
+    "test_date": "2026-02-12T19:08:34.487246",
+    "total_questions": 53,
+    "chat_endpoint": "http://localhost:5003/chat/ask",
+    "database_host": "db.cxzhgidmzosdavugggks.supabase.co"
+  },
+  "questions": [
+    {
+      "id": 20,
+      "question": "How do I report a stray animal?",
+      "category": "Animal Control",
+      "subcategory": "Stray Animals",
+      "question_type": "how_to",
+      "approved_answer": "For stray animals, call Louisville Metro Animal Services directly at (502) 473-PETS (7387) or 311. Provide the location and description of the animal. If the animal appears aggressive or injured, mention this for priority response. Animal Services will dispatch an officer. Response times vary based on urgency and current call volume. For aggressive or dangerous animals, call 911 if there's an immediate threat.",
+      "agent_response": "For stray animals, call Louisville Metro Animal Services directly at (502) 473-PETS (7387) or 311. Provide the location and description of the animal. If the animal appears aggressive or injured, mention this for priority response. Animal Services will dispatch an officer. Response times vary based on urgency and current call volume. For aggressive or dangerous animals, call 911 if there's an immediate threat.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Animal Control"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.2420969009399414
+    },
+    {
+      "id": 21,
+      "question": "How do I report a barking dog complaint?",
+      "category": "Animal Control",
+      "subcategory": "Noise Complaints",
+      "question_type": "how_to",
+      "approved_answer": "For ongoing barking dog complaints, call 311. Provide the address where the dog is located and details about when the barking occurs. Louisville Metro will send a notice to the property owner. Keep a log of dates and times if the issue continues. For immediate disturbances late at night, you can also contact LMPD non-emergency at (502) 574-7111.",
+      "agent_response": "For ongoing barking dog complaints, call 311. Provide the address where the dog is located and details about when the barking occurs. Louisville Metro will send a notice to the property owner. Keep a log of dates and times if the issue continues. For immediate disturbances late at night, you can also contact LMPD non-emergency at (502) 574-7111.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Animal Control"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.22293519973754883
+    },
+    {
+      "id": 15,
+      "question": "How do I report a property code violation?",
+      "category": "Code Enforcement",
+      "subcategory": "Property Violations",
+      "question_type": "how_to",
+      "approved_answer": "Call 311 or submit online at louisvilleky.gov/311 to report property code violations like overgrown grass, abandoned vehicles, trash accumulation, or structural issues. Provide the address and describe the violation. Code Enforcement will inspect and contact the property owner if violations exist. Resolution timelines vary but inspections typically occur within 3-5 business days.",
+      "agent_response": "Call 311 or submit online at louisvilleky.gov/311 to report property code violations like overgrown grass, abandoned vehicles, trash accumulation, or structural issues. Provide the address and describe the violation. Code Enforcement will inspect and contact the property owner if violations exist. Resolution timelines vary but inspections typically occur within 3-5 business days.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": true,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": []
+      },
+      "status": "passed",
+      "response_time": 0.2202010154724121
+    },
+    {
+      "id": 16,
+      "question": "How do I report an abandoned vehicle?",
+      "category": "Code Enforcement",
+      "subcategory": "Abandoned Vehicles",
+      "question_type": "how_to",
+      "approved_answer": "To report an abandoned vehicle on public property, call 311 with the location, vehicle description (make, model, color), and license plate if visible. The vehicle will be tagged and given time to be moved. If not moved within the specified time, it will be towed. For vehicles on private property, contact Code Enforcement through 311.",
+      "agent_response": "To report an abandoned vehicle on public property, call 311 with the location, vehicle description (make, model, color), and license plate if visible. The vehicle will be tagged and given time to be moved. If not moved within the specified time, it will be towed. For vehicles on private property, contact Code Enforcement through 311.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": true,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": []
+      },
+      "status": "passed",
+      "response_time": 0.22751498222351074
+    },
+    {
+      "id": 17,
+      "question": "How do I report overgrown grass or weeds?",
+      "category": "Code Enforcement",
+      "subcategory": "Tall Grass",
+      "question_type": "how_to",
+      "approved_answer": "Call 311 to report overgrown grass or weeds on a property. Provide the address. Code Enforcement will send a notice to the property owner to cut the grass within a specified timeframe (usually 10 days). If not addressed, the city may cut it and bill the owner. Grass must be kept under 12 inches tall within the city.",
+      "agent_response": "Call 311 to report overgrown grass or weeds on a property. Provide the address. Code Enforcement will send a notice to the property owner to cut the grass within a specified timeframe (usually 10 days). If not addressed, the city may cut it and bill the owner. Grass must be kept under 12 inches tall within the city.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": true,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": []
+      },
+      "status": "passed",
+      "response_time": 0.22522592544555664
+    },
+    {
+      "id": 25,
+      "question": "How do I report interior housing code violations?",
+      "category": "Code Enforcement",
+      "subcategory": "Interior Violations",
+      "question_type": "how_to",
+      "approved_answer": "For serious interior housing issues like no heat, no water, mold, pest infestations, or unsafe conditions in rental properties, call 311 immediately. Provide the property address and describe the specific violations. Louisville Metro Code Enforcement will inspect the property, typically within 24-48 hours for urgent issues. They will issue orders to the property owner to make repairs. If you are a tenant, you cannot be evicted for reporting code violations - this is protected by law. For emergency situations (no heat in winter, no water), call 311 and emphasize the emergency nature.",
+      "agent_response": "For serious interior housing issues like no heat, no water, mold, pest infestations, or unsafe conditions in rental properties, call 311 immediately. Provide the property address and describe the specific violations. Louisville Metro Code Enforcement will inspect the property, typically within 24-48 hours for urgent issues. They will issue orders to the property owner to make repairs. If you are a tenant, you cannot be evicted for reporting code violations - this is protected by law. For emergency situations (no heat in winter, no water), call 311 and emphasize the emergency nature.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": true,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": []
+      },
+      "status": "passed",
+      "response_time": 0.22758078575134277
+    },
+    {
+      "id": 26,
+      "question": "How do I report tall grass or overgrown weeds on a property?",
+      "category": "Code Enforcement",
+      "subcategory": "Tall Grass",
+      "question_type": "how_to",
+      "approved_answer": "Call 311 to report overgrown grass or weeds on a property (grass over 12 inches tall). Provide the complete address. Code Enforcement will inspect and send a notice to the property owner requiring them to cut the grass within 10 days. If not addressed, the city may cut it and bill the owner. This applies to both residential and commercial properties. Grass and weeds must be kept under 12 inches tall within Louisville Metro.",
+      "agent_response": "Call 311 to report overgrown grass or weeds on a property (grass over 12 inches tall). Provide the complete address. Code Enforcement will inspect and send a notice to the property owner requiring them to cut the grass within 10 days. If not addressed, the city may cut it and bill the owner. This applies to both residential and commercial properties. Grass and weeds must be kept under 12 inches tall within Louisville Metro.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": true,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": []
+      },
+      "status": "passed",
+      "response_time": 0.22161602973937988
+    },
+    {
+      "id": 37,
+      "question": "How do I report a zoning violation?",
+      "category": "Code Enforcement",
+      "subcategory": "Zoning Violations",
+      "question_type": "how_to",
+      "approved_answer": "To report zoning violations (business operating from home without permit, commercial activity in residential area, improper use of property, unpermitted structures), call 311 with the property address and describe the violation. Planning & Design Services will investigate to determine if the use complies with zoning regulations. Zoning inspections typically occur within 5-10 business days. If violations exist, the property owner will receive notice to comply or apply for proper permits.",
+      "agent_response": "To report zoning violations (business operating from home without permit, commercial activity in residential area, improper use of property, unpermitted structures), call 311 with the property address and describe the violation. Planning &amp; Design Services will investigate to determine if the use complies with zoning regulations. Zoning inspections typically occur within 5-10 business days. If violations exist, the property owner will receive notice to comply or apply for proper permits.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 0.9959432048681541,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Zoning Concern"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.22376775741577148
+    },
+    {
+      "id": 38,
+      "question": "How do I report unpermitted construction or building work?",
+      "category": "Code Enforcement",
+      "subcategory": "Building Permits",
+      "question_type": "how_to",
+      "approved_answer": "To report construction work without permits (additions, major renovations, commercial construction, demolition), call 311 with the property address and describe the work being done. Louisville Metro Inspections will investigate. All major construction, electrical, plumbing, and HVAC work requires permits. Working without permits can result in stop-work orders and fines. To check if permits were issued for an address, visit louisvilleky.gov/government/inspections or call (502) 574-3321.",
+      "agent_response": "To report construction work without permits (additions, major renovations, commercial construction, demolition), call 311 with the property address and describe the work being done. Louisville Metro Inspections will investigate. All major construction, electrical, plumbing, and HVAC work requires permits. Working without permits can result in stop-work orders and fines. To check if permits were issued for an address, visit louisvilleky.gov/government/inspections or call (502) 574-3321.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Building Permits"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.24177312850952148
+    },
+    {
+      "id": 42,
+      "question": "How do I report a noise complaint?",
+      "category": "Code Enforcement",
+      "subcategory": "Noise Ordinance",
+      "question_type": "how_to",
+      "approved_answer": "For noise complaints (loud music, loud parties, ongoing disturbances), call 311 during business hours or LMPD non-emergency at (502) 574-7111 for after-hours or immediate issues. Louisville Metro noise ordinances prohibit excessive noise (amplified music, loud equipment) that disturbs others, especially late at night (10 PM - 7 AM). For barking dogs, call 311 and provide the address and details about when barking occurs. Keep a log of dates and times for ongoing issues.",
+      "agent_response": "For noise complaints (loud music, loud parties, ongoing disturbances), call 311 during business hours or LMPD non-emergency at (502) 574-7111 for after-hours or immediate issues. Louisville Metro noise ordinances prohibit excessive noise (amplified music, loud equipment) that disturbs others, especially late at night (10 PM - 7 AM). For barking dogs, call 311 and provide the address and details about when barking occurs. Keep a log of dates and times for ongoing issues.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Noise Concern"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.22430109977722168
+    },
+    {
+      "id": 46,
+      "question": "How do I report a junk or abandoned vehicle on private property?",
+      "category": "Code Enforcement",
+      "subcategory": "Vehicle Storage",
+      "question_type": "how_to",
+      "approved_answer": "To report junk vehicles, inoperable vehicles, or vehicles stored improperly on private property (yards, driveways), call 311 with the property address and vehicle description. Code Enforcement will inspect. Vehicles must be operable, have current registration, and be stored on paved surfaces (not grass). Inoperable vehicles are not allowed to be stored in residential areas except in enclosed garages. Inspections occur within 3-5 business days. For vehicles on PUBLIC streets, use the abandoned vehicle on public property process (tagged, then towed after 72 hours).",
+      "agent_response": "To report junk vehicles, inoperable vehicles, or vehicles stored improperly on private property (yards, driveways), call 311 with the property address and vehicle description. Code Enforcement will inspect. Vehicles must be operable, have current registration, and be stored on paved surfaces (not grass). Inoperable vehicles are not allowed to be stored in residential areas except in enclosed garages. Inspections occur within 3-5 business days. For vehicles on PUBLIC streets, use the abandoned vehicle on public property process (tagged, then towed after 72 hours).",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Vehicle on Private Property"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.2242879867553711
+    },
+    {
+      "id": 47,
+      "question": "How do I report general property maintenance violations?",
+      "category": "Code Enforcement",
+      "subcategory": "Property Maintenance",
+      "question_type": "how_to",
+      "approved_answer": "To report property maintenance issues (deteriorating structures, broken windows, damaged siding, roof damage, unsafe porches/stairs), call 311 with the property address. Code Enforcement will inspect for violations of property maintenance standards. Properties must be maintained in good repair and free from hazards. Inspections typically occur within 5-7 business days. For immediate safety hazards (collapsing structures, dangerous conditions), mention this when reporting for priority response.",
+      "agent_response": "To report property maintenance issues (deteriorating structures, broken windows, damaged siding, roof damage, unsafe porches/stairs), call 311 with the property address. Code Enforcement will inspect for violations of property maintenance standards. Properties must be maintained in good repair and free from hazards. Inspections typically occur within 5-7 business days. For immediate safety hazards (collapsing structures, dangerous conditions), mention this when reporting for priority response.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": true,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": []
+      },
+      "status": "passed",
+      "response_time": 0.21940827369689941
+    },
+    {
+      "id": 49,
+      "question": "How do I report graffiti for removal?",
+      "category": "Code Enforcement",
+      "subcategory": "Graffiti",
+      "question_type": "how_to",
+      "approved_answer": "To report graffiti on public property (signs, bridges, buildings, walls), call 311 with the location. Louisville Metro will remove graffiti from public property, typically within 7-10 business days. For graffiti on private property, the property owner is responsible for removal. The city may issue a notice requiring removal if it's visible from public areas. Take photos if possible to document. To volunteer for graffiti cleanup in your neighborhood, ask 311 about community programs.",
+      "agent_response": "To report graffiti on public property (signs, bridges, buildings, walls), call 311 with the location. Louisville Metro will remove graffiti from public property, typically within 7-10 business days. For graffiti on private property, the property owner is responsible for removal. The city may issue a notice requiring removal if it's visible from public areas. Take photos if possible to document. To volunteer for graffiti cleanup in your neighborhood, ask 311 about community programs.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": false,
+        "mentions_service": true,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Missing key keywords from: ['graffiti', 'vandalism', 'spray paint', 'tagging', 'defacement']"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.22192692756652832
+    },
+    {
+      "id": 51,
+      "question": "How do I report exterior property code violations?",
+      "category": "Code Enforcement",
+      "subcategory": "Exterior Property",
+      "question_type": "how_to",
+      "approved_answer": "To report exterior property violations (trash accumulation, junk storage, damaged fences, peeling paint, broken gutters, vehicles on grass), call 311 with the property address and description. Code Enforcement will inspect the property for violations of property maintenance codes. Properties must be free from trash accumulation, junk storage, and structural deterioration. Inspections occur within 3-5 business days. Property owners will receive notice to correct violations, typically with 10-30 days to comply depending on severity.",
+      "agent_response": "To report exterior property violations (trash accumulation, junk storage, damaged fences, peeling paint, broken gutters, vehicles on grass), call 311 with the property address and description. Code Enforcement will inspect the property for violations of property maintenance codes. Properties must be free from trash accumulation, junk storage, and structural deterioration. Inspections occur within 3-5 business days. Property owners will receive notice to correct violations, typically with 10-30 days to comply depending on severity.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": true,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": []
+      },
+      "status": "passed",
+      "response_time": 0.2239677906036377
+    },
+    {
+      "id": 27,
+      "question": "How do I report severe weather damage?",
+      "category": "Emergency Services",
+      "subcategory": "Storm Damage",
+      "question_type": "how_to",
+      "approved_answer": "For severe weather damage (storm damage, fallen trees blocking roads, downed power lines, flooding), call 311 immediately or 911 if there is immediate danger to life or property. Provide the location and describe the hazard. For downed power lines, also call LG&E at (502) 589-1444. Emergency crews prioritize life-safety issues first (blocked roads, downed lines, flooding) and typically respond within 1-2 hours. Non-emergency storm cleanup (debris removal, tree trimming) may take 3-7 days depending on volume.",
+      "agent_response": "For severe weather damage (storm damage, fallen trees blocking roads, downed power lines, flooding), call 311 immediately or 911 if there is immediate danger to life or property. Provide the location and describe the hazard. For downed power lines, also call LG&amp;E at (502) 589-1444. Emergency crews prioritize life-safety issues first (blocked roads, downed lines, flooding) and typically respond within 1-2 hours. Non-emergency storm cleanup (debris removal, tree trimming) may take 3-7 days depending on volume.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 0.996116504854369,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Emergency Services"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.22319698333740234
+    },
+    {
+      "id": 31,
+      "question": "How do I report a strong odor or smell concern?",
+      "category": "Environmental",
+      "subcategory": "Odor Complaints",
+      "question_type": "how_to",
+      "approved_answer": "For persistent strong odors (chemical smells, sewage, industrial odors, garbage smells), call 311 with the location and description of the odor, including when it occurs. Louisville Metro Air Pollution Control District (APCD) will investigate. Describe the smell (chemical, burning, sewage, garbage, etc.) and time of day it's strongest. For immediate health concerns or strong chemical smells, also call 911. Investigations typically occur within 24-48 hours for urgent concerns, 3-5 days for routine odor complaints.",
+      "agent_response": "For persistent strong odors (chemical smells, sewage, industrial odors, garbage smells), call 311 with the location and description of the odor, including when it occurs. Louisville Metro Air Pollution Control District (APCD) will investigate. Describe the smell (chemical, burning, sewage, garbage, etc.) and time of day it's strongest. For immediate health concerns or strong chemical smells, also call 911. Investigations typically occur within 24-48 hours for urgent concerns, 3-5 days for routine odor complaints.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Environmental"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.22266817092895508
+    },
+    {
+      "id": 33,
+      "question": "How do I report illegal open burning?",
+      "category": "Environmental",
+      "subcategory": "Illegal Burning",
+      "question_type": "how_to",
+      "approved_answer": "Open burning is illegal in Louisville Metro except for small recreational fires and approved agricultural burning. To report illegal burning (trash, debris, tires, construction materials), call 311 with the location and what is being burned. For large fires or immediate danger, call 911. Louisville Metro Air Pollution Control District (APCD) will investigate. Burning trash, tires, or materials that create excessive smoke is prohibited and subject to fines. Only small recreational fires (campfires, fire pits) are allowed.",
+      "agent_response": "Open burning is illegal in Louisville Metro except for small recreational fires and approved agricultural burning. To report illegal burning (trash, debris, tires, construction materials), call 311 with the location and what is being burned. For large fires or immediate danger, call 911. Louisville Metro Air Pollution Control District (APCD) will investigate. Burning trash, tires, or materials that create excessive smoke is prohibited and subject to fines. Only small recreational fires (campfires, fire pits) are allowed.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Environmental"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.2338240146636963
+    },
+    {
+      "id": 1,
+      "question": "What is 311?",
+      "category": "General",
+      "subcategory": "About 311",
+      "question_type": "what_is",
+      "approved_answer": "311 is Louisville Metro's non-emergency service request system. It's available 24/7 for reporting city service issues like potholes, missed trash pickup, code violations, park maintenance, and more. You can call 311 (or 574-5000 from outside Louisville), use the online portal at louisvilleky.gov/311, or download the mobile app. For emergencies, always call 911.",
+      "agent_response": "911 is for emergencies that require immediate police, fire, or medical response - like crimes in progress, fires, medical emergencies, or serious accidents. 311 is for non-emergency city services like reporting potholes, requesting bulk trash pickup, reporting code violations, or asking about city services. When in doubt: if it's an emergency or someone's safety is at risk, call 911.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 0.03471295060080107,
+        "contains_keywords": true,
+        "mentions_service": true,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Low similarity to approved answer (3.47%)"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.22366690635681152
+    },
+    {
+      "id": 2,
+      "question": "How do I submit a 311 service request?",
+      "category": "General",
+      "subcategory": "Submitting Requests",
+      "question_type": "how_to",
+      "approved_answer": "There are three easy ways to submit a 311 request: 1) Call 311 from within Louisville Metro (or 574-5000 from outside), 2) Visit the online portal at louisvilleky.gov/311, or 3) Download the Louisville Metro mobile app. When submitting, provide the location and a clear description of the issue. You'll receive a tracking number to check the status of your request.",
+      "agent_response": "There are three easy ways to submit a 311 request: 1) Call 311 from within Louisville Metro (or 574-5000 from outside), 2) Visit the online portal at louisvilleky.gov/311, or 3) Download the Louisville Metro mobile app. When submitting, provide the location and a clear description of the issue. You'll receive a tracking number to check the status of your request.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": true,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": []
+      },
+      "status": "passed",
+      "response_time": 0.2186417579650879
+    },
+    {
+      "id": 3,
+      "question": "What's the difference between 311 and 911?",
+      "category": "General",
+      "subcategory": "About 311",
+      "question_type": "what_is",
+      "approved_answer": "911 is for emergencies that require immediate police, fire, or medical response - like crimes in progress, fires, medical emergencies, or serious accidents. 311 is for non-emergency city services like reporting potholes, requesting bulk trash pickup, reporting code violations, or asking about city services. When in doubt: if it's an emergency or someone's safety is at risk, call 911.",
+      "agent_response": "911 is for emergencies that require immediate police, fire, or medical response - like crimes in progress, fires, medical emergencies, or serious accidents. 311 is for non-emergency city services like reporting potholes, requesting bulk trash pickup, reporting code violations, or asking about city services. When in doubt: if it's an emergency or someone's safety is at risk, call 911.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": true,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": []
+      },
+      "status": "passed",
+      "response_time": 0.22811198234558105
+    },
+    {
+      "id": 4,
+      "question": "How do I track the status of my 311 request?",
+      "category": "General",
+      "subcategory": "Tracking",
+      "question_type": "how_to",
+      "approved_answer": "You can track your request using your tracking number in three ways: 1) Visit louisvilleky.gov/311 and enter your tracking number, 2) Call 311 and provide your tracking number, or 3) Use the mobile app to check status. If you don't have your tracking number, call 311 with your address and request details - they can look it up for you.",
+      "agent_response": "You can track your request using your tracking number in three ways: 1) Visit louisvilleky.gov/311 and enter your tracking number, 2) Call 311 and provide your tracking number, or 3) Use the mobile app to check status. If you don't have your tracking number, call 311 with your address and request details - they can look it up for you.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": true,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": []
+      },
+      "status": "passed",
+      "response_time": 0.2270500659942627
+    },
+    {
+      "id": 5,
+      "question": "How long does it take to fix my issue?",
+      "category": "General",
+      "subcategory": "Timelines",
+      "question_type": "timeline",
+      "approved_answer": "Response times vary by issue type and urgency: High urgency issues (like water main breaks) are usually addressed within 24-48 hours. Standard requests (like pothole repairs) typically take 3-7 days. Routine maintenance can take 1-2 weeks depending on scheduling. You can call 311 anytime to check the status of your specific request using your tracking number.",
+      "agent_response": "Response times vary by issue type and urgency: High urgency issues (like water main breaks) are usually addressed within 24-48 hours. Standard requests (like pothole repairs) typically take 3-7 days. Routine maintenance can take 1-2 weeks depending on scheduling. You can call 311 anytime to check the status of your specific request using your tracking number.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": false,
+        "mentions_service": true,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Missing key keywords from: ['how long', 'time', 'when', 'timeline']"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.22791194915771484
+    },
+    {
+      "id": 44,
+      "question": "What does NSR mean and when should I use it?",
+      "category": "General",
+      "subcategory": "System Information",
+      "question_type": "what_is",
+      "approved_answer": "NSR stands for \"Non-Service Request\" - these are information requests, referrals, or inquiries that don't require a physical service or inspection. Common NSR categories include: NSR Metro Agencies (general information about city departments), NSR Social Services (referrals to social programs), NSR Government (questions about policies or procedures), and NSR Utility (utility company contact info). Use NSR when you need information, phone numbers, or guidance rather than reporting a problem. For actual service requests (potholes, missed trash, code violations), select the specific service type, not NSR.",
+      "agent_response": "NSR stands for \"Non-Service Request\" - these are information requests, referrals, or inquiries that don't require a physical service or inspection. Common NSR categories include: NSR Metro Agencies (general information about city departments), NSR Social Services (referrals to social programs), NSR Government (questions about policies or procedures), and NSR Utility (utility company contact info). Use NSR when you need information, phone numbers, or guidance rather than reporting a problem. For actual service requests (potholes, missed trash, code violations), select the specific service type, not NSR.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": true,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": []
+      },
+      "status": "passed",
+      "response_time": 0.22666597366333008
+    },
+    {
+      "id": 52,
+      "question": "How do I get information about special events or event permits?",
+      "category": "General",
+      "subcategory": "Events and Permits",
+      "question_type": "what_is",
+      "approved_answer": "For information about upcoming city events, visit louisvilleky.gov/events or call 311. To apply for a special event permit (block party, parade, festival, street closure), contact Special Events at (502) 574-3961 or visit louisvilleky.gov/government/special-events. Applications must be submitted at least 60 days in advance for events requiring street closures. 311 can provide contact information and basic guidance but cannot process permit applications directly.",
+      "agent_response": "For information about upcoming city events, visit louisvilleky.gov/events or call 311. To apply for a special event permit (block party, parade, festival, street closure), contact Special Events at (502) 574-3961 or visit louisvilleky.gov/government/special-events. Applications must be submitted at least 60 days in advance for events requiring street closures. 311 can provide contact information and basic guidance but cannot process permit applications directly.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: NSR Events"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.22324514389038086
+    },
+    {
+      "id": 43,
+      "question": "How do I report a pest or rodent problem?",
+      "category": "Health",
+      "subcategory": "Pest Control",
+      "question_type": "how_to",
+      "approved_answer": "For pest issues on private property (rodents, roaches, bedbugs in rentals), contact your landlord first if renting, or a licensed pest control service if you own the property. For public health concerns (rat infestations in alleys, mosquito breeding areas, vector control issues), call 311 and Louisville Metro Public Health will investigate. Health inspections for rental properties with severe pest infestations can be requested through 311 - provide the property address. Response time is typically 5-7 business days for health investigations.",
+      "agent_response": "For pest issues on private property (rodents, roaches, bedbugs in rentals), contact your landlord first if renting, or a licensed pest control service if you own the property. For public health concerns (rat infestations in alleys, mosquito breeding areas, vector control issues), call 311 and Louisville Metro Public Health will investigate. Health inspections for rental properties with severe pest infestations can be requested through 311 - provide the property address. Response time is typically 5-7 business days for health investigations.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": true,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": []
+      },
+      "status": "passed",
+      "response_time": 0.2264411449432373
+    },
+    {
+      "id": 48,
+      "question": "How do I report a parking violation or concern?",
+      "category": "Parking",
+      "subcategory": "Violations",
+      "question_type": "how_to",
+      "approved_answer": "To report parking violations (blocking sidewalks, parking in fire lanes, parking too close to intersections, disabled parking violations), call 311 or Parking Authority at (502) 574-7275. LMPD handles parking enforcement on public streets. For vehicles blocking driveways or alleys, call LMPD non-emergency: (502) 574-7111. For parking in front of fire hydrants (within 15 feet), call 311 or LMPD. For abandoned vehicles on public streets, call 311 - vehicles will be tagged and towed if not moved within 72 hours.",
+      "agent_response": "To report parking violations (blocking sidewalks, parking in fire lanes, parking too close to intersections, disabled parking violations), call 311 or Parking Authority at (502) 574-7275. LMPD handles parking enforcement on public streets. For vehicles blocking driveways or alleys, call LMPD non-emergency: (502) 574-7111. For parking in front of fire hydrants (within 15 feet), call 311 or LMPD. For abandoned vehicles on public streets, call 311 - vehicles will be tagged and towed if not moved within 72 hours.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Parking Concern"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.22315430641174316
+    },
+    {
+      "id": 18,
+      "question": "How do I report a problem at a park?",
+      "category": "Parks",
+      "subcategory": "Park Maintenance",
+      "question_type": "how_to",
+      "approved_answer": "Call 311 to report park issues like broken equipment, maintenance needs, lighting problems, or safety concerns. Provide the park name and location of the issue. Louisville Metro Parks will assess and prioritize repairs. Urgent safety issues (broken glass, dangerous equipment) are addressed within 24-48 hours. Routine maintenance may take 1-2 weeks.",
+      "agent_response": "Call 311 to report park issues like broken equipment, maintenance needs, lighting problems, or safety concerns. Provide the park name and location of the issue. Louisville Metro Parks will assess and prioritize repairs. Urgent safety issues (broken glass, dangerous equipment) are addressed within 24-48 hours. Routine maintenance may take 1-2 weeks.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": true,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": []
+      },
+      "status": "passed",
+      "response_time": 0.23829102516174316
+    },
+    {
+      "id": 19,
+      "question": "How do I report a tree problem?",
+      "category": "Parks",
+      "subcategory": "Tree Maintenance",
+      "question_type": "how_to",
+      "approved_answer": "To report tree issues on public property (fallen trees, dead trees, hanging branches), call 311 with the location. Louisville Metro Forestry will assess the tree. Emergency situations (trees blocking roads, immediate hazards) are handled within 24 hours. Non-emergency tree trimming and removal can take 2-4 weeks. For trees on private property, contact a private tree service.",
+      "agent_response": "To report tree issues on public property (fallen trees, dead trees, hanging branches), call 311 with the location. Louisville Metro Forestry will assess the tree. Emergency situations (trees blocking roads, immediate hazards) are handled within 24 hours. Non-emergency tree trimming and removal can take 2-4 weeks. For trees on private property, contact a private tree service.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Parks"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.21919703483581543
+    },
+    {
+      "id": 29,
+      "question": "How do I report a dangerous or hazardous tree?",
+      "category": "Parks",
+      "subcategory": "Tree Hazards",
+      "question_type": "how_to",
+      "approved_answer": "To report dangerous trees on public property (dead trees, trees leaning over roads, large broken limbs, trees blocking streets), call 311 with the location. Louisville Metro Forestry will assess the tree for safety hazards. Emergency situations (trees blocking roads, imminent fall risk, limbs on power lines) are handled within 24 hours. Non-emergency hazardous tree removal can take 1-4 weeks depending on severity and scheduling. For trees on private property, contact a licensed tree service. For limbs on power lines, also call LG&E at (502) 589-1444.",
+      "agent_response": "To report dangerous trees on public property (dead trees, trees leaning over roads, large broken limbs, trees blocking streets), call 311 with the location. Louisville Metro Forestry will assess the tree for safety hazards. Emergency situations (trees blocking roads, imminent fall risk, limbs on power lines) are handled within 24 hours. Non-emergency hazardous tree removal can take 1-4 weeks depending on severity and scheduling. For trees on private property, contact a licensed tree service. For limbs on power lines, also call LG&amp;E at (502) 589-1444.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 0.996415770609319,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Parks"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.22315597534179688
+    },
+    {
+      "id": 34,
+      "question": "How do I report a homeless camp or encampment?",
+      "category": "Social Services",
+      "subcategory": "Homeless Services",
+      "question_type": "how_to",
+      "approved_answer": "To report homeless encampments on public property, call 311 with the location. Louisville Metro coordinates with social services and outreach teams to offer assistance and resources to individuals experiencing homelessness. The city balances compassion with public safety and health concerns. Encampments on public property or blocking sidewalks/rights-of-way will be addressed with advance notice when possible. For immediate safety concerns or trespassing on private property, contact LMPD non-emergency at (502) 574-7111.",
+      "agent_response": "To report homeless encampments on public property, call 311 with the location. Louisville Metro coordinates with social services and outreach teams to offer assistance and resources to individuals experiencing homelessness. The city balances compassion with public safety and health concerns. Encampments on public property or blocking sidewalks/rights-of-way will be addressed with advance notice when possible. For immediate safety concerns or trespassing on private property, contact LMPD non-emergency at (502) 574-7111.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Homeless Camp Concern"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.24100685119628906
+    },
+    {
+      "id": 53,
+      "question": "How do I get help with housing, food, or other social services?",
+      "category": "Social Services",
+      "subcategory": "Referrals",
+      "question_type": "what_is",
+      "approved_answer": "Louisville Metro 311 can provide referrals to social service agencies. Call 311 and describe what assistance you need: housing assistance, food assistance, utility payment help, mental health services, substance abuse treatment, senior services, or other support programs. 311 will provide contact information for appropriate agencies. For immediate crisis assistance: Kentucky Crisis Line: 988 | Homeless Services: (502) 574-6465 | Metro United Way 2-1-1 for comprehensive resource referrals. 311 provides referrals and information but does not directly provide social services.",
+      "agent_response": "Louisville Metro 311 can provide referrals to social service agencies. Call 311 and describe what assistance you need: housing assistance, food assistance, utility payment help, mental health services, substance abuse treatment, senior services, or other support programs. 311 will provide contact information for appropriate agencies. For immediate crisis assistance: Kentucky Crisis Line: 988 | Homeless Services: (502) 574-6465 | Metro United Way 2-1-1 for comprehensive resource referrals. 311 provides referrals and information but does not directly provide social services.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: NSR Social Services"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.22043228149414062
+    },
+    {
+      "id": 11,
+      "question": "How do I report a pothole?",
+      "category": "Street Maintenance",
+      "subcategory": "Pothole Repair",
+      "question_type": "how_to",
+      "approved_answer": "To report a pothole, call 311 or submit online at louisvilleky.gov/311 with the exact location (address or cross streets). Describe the size and location in the road. You'll get a tracking number to follow up. Pothole repairs typically take 3-7 days depending on severity and weather. For urgent safety hazards, mention that when reporting.",
+      "agent_response": "To report a pothole, call 311 or submit online at louisvilleky.gov/311 with the exact location (address or cross streets). Describe the size and location in the road. You'll get a tracking number to follow up. Pothole repairs typically take 3-7 days depending on severity and weather. For urgent safety hazards, mention that when reporting.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Street Maintenance"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.22644710540771484
+    },
+    {
+      "id": 12,
+      "question": "How do I report a streetlight that's out?",
+      "category": "Street Maintenance",
+      "subcategory": "Streetlight",
+      "question_type": "how_to",
+      "approved_answer": "To report a streetlight outage, call 311 or submit online with the nearest address or intersection. If possible, note the pole number (on a sticker on the pole). LG&E handles streetlight repairs, and Louisville Metro will forward your request. Repairs typically take 3-5 business days. For multiple lights out in an area, report all locations.",
+      "agent_response": "To report streetlight issues (light out, flickering, on during day, damaged pole), call 311 with the nearest address or intersection. If possible, note the pole number (on a sticker on the pole). LG&amp;E maintains streetlights in Louisville Metro - 311 will forward your request to them. Standard repairs typically take 3-5 business days. For multiple lights out in an area, report all locations. For damaged poles or downed lines, this is higher priority and typically addressed within 24 hours.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 0.3404761904761905,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Street Maintenance"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.2303318977355957
+    },
+    {
+      "id": 13,
+      "question": "How do I report damaged sidewalk?",
+      "category": "Street Maintenance",
+      "subcategory": "Sidewalk Repair",
+      "question_type": "how_to",
+      "approved_answer": "To report sidewalk damage, call 311 with the location and description of the damage (cracked, uneven, missing sections). Louisville Metro Public Works will assess the sidewalk. Repair timeline varies based on severity and budget availability. For immediate safety hazards (large holes, completely missing sections), mention this when reporting for priority attention.",
+      "agent_response": "To report sidewalk damage, call 311 with the location and description of the damage (cracked, uneven, missing sections). Louisville Metro Public Works will assess the sidewalk. Repair timeline varies based on severity and budget availability. For immediate safety hazards (large holes, completely missing sections), mention this when reporting for priority attention.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Street Maintenance"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.2234339714050293
+    },
+    {
+      "id": 14,
+      "question": "How do I report a missing or damaged street sign?",
+      "category": "Street Maintenance",
+      "subcategory": "Street Signs",
+      "question_type": "how_to",
+      "approved_answer": "Call 311 to report missing, damaged, or faded street signs. Provide the location (intersection or address) and describe the issue. Louisville Metro will replace or repair traffic and street name signs. Standard repairs take 5-7 business days. Stop signs and critical traffic signs are prioritized and typically replaced within 24-48 hours.",
+      "agent_response": "Call 311 to report missing, damaged, or faded street signs. Provide the location (intersection or address) and describe the issue. Louisville Metro will replace or repair traffic and street name signs. Standard repairs take 5-7 business days. Stop signs and critical traffic signs are prioritized and typically replaced within 24-48 hours.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Street Maintenance"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.21594977378845215
+    },
+    {
+      "id": 24,
+      "question": "How do I report a street or road problem?",
+      "category": "Street Maintenance",
+      "subcategory": "Road Repair",
+      "question_type": "how_to",
+      "approved_answer": "To report street or road issues like potholes, cracks, sinkholes, or pavement damage, call 311 or submit online at louisvilleky.gov/311 with the exact location (address or cross streets). Describe the problem and its size. You'll receive a tracking number to follow up. High-priority safety hazards (large potholes, sinkholes) are typically addressed within 24-48 hours. Standard repairs take 3-7 days depending on severity and weather conditions.",
+      "agent_response": "To report street or road issues like potholes, cracks, sinkholes, or pavement damage, call 311 or submit online at louisvilleky.gov/311 with the exact location (address or cross streets). Describe the problem and its size. You'll receive a tracking number to follow up. High-priority safety hazards (large potholes, sinkholes) are typically addressed within 24-48 hours. Standard repairs take 3-7 days depending on severity and weather conditions.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": true,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": []
+      },
+      "status": "passed",
+      "response_time": 0.22758984565734863
+    },
+    {
+      "id": 28,
+      "question": "How do I report a broken or malfunctioning traffic signal?",
+      "category": "Street Maintenance",
+      "subcategory": "Traffic Signals",
+      "question_type": "how_to",
+      "approved_answer": "For traffic signal issues (lights out, stuck on red/green, flashing when not intended, damaged signals), call 311 immediately with the intersection location. Traffic Engineering will dispatch crews to assess the issue. Critical malfunctions affecting traffic flow are prioritized and typically addressed within 2-4 hours. If a signal is completely out, treat the intersection as a 4-way stop until repaired. For accidents involving signal damage, also call LMPD.",
+      "agent_response": "For traffic signal issues (lights out, stuck on red/green, flashing when not intended, damaged signals), call 311 immediately with the intersection location. Traffic Engineering will dispatch crews to assess the issue. Critical malfunctions affecting traffic flow are prioritized and typically addressed within 2-4 hours. If a signal is completely out, treat the intersection as a 4-way stop until repaired. For accidents involving signal damage, also call LMPD.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Traffic Signals"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.22840213775634766
+    },
+    {
+      "id": 36,
+      "question": "How do I report a dangerous sidewalk or curb?",
+      "category": "Street Maintenance",
+      "subcategory": "Sidewalk Hazards",
+      "question_type": "how_to",
+      "approved_answer": "To report dangerous sidewalk conditions (large cracks, missing sections, trip hazards, severe unevenness), call 311 with the location and description. Louisville Metro Public Works will assess the hazard. Emergency repairs for severe safety hazards (missing sidewalk sections, large holes) are prioritized and addressed within 1-2 weeks. Standard sidewalk repairs can take 4-8 weeks depending on severity and budget. For snow/ice on sidewalks, property owners are responsible for clearing within 48 hours of snowfall.",
+      "agent_response": "To report dangerous sidewalk conditions (large cracks, missing sections, trip hazards, severe unevenness), call 311 with the location and description. Louisville Metro Public Works will assess the hazard. Emergency repairs for severe safety hazards (missing sidewalk sections, large holes) are prioritized and addressed within 1-2 weeks. Standard sidewalk repairs can take 4-8 weeks depending on severity and budget. For snow/ice on sidewalks, property owners are responsible for clearing within 48 hours of snowfall.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Sidewalks/Curbs"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.23697566986083984
+    },
+    {
+      "id": 39,
+      "question": "How do I report a damaged, missing, or faded street sign?",
+      "category": "Street Maintenance",
+      "subcategory": "Street Signs",
+      "question_type": "how_to",
+      "approved_answer": "Call 311 to report missing, damaged, knocked down, or faded street signs. Provide the location (intersection or address) and describe the issue. Louisville Metro will replace or repair traffic and street name signs. Stop signs and critical traffic control signs are prioritized and typically replaced within 24-48 hours. Standard street name signs are replaced within 5-7 business days. For traffic signals or signal poles, these are higher priority and addressed within 2-4 hours if affecting safety.",
+      "agent_response": "Call 311 to report missing, damaged, knocked down, or faded street signs. Provide the location (intersection or address) and describe the issue. Louisville Metro will replace or repair traffic and street name signs. Stop signs and critical traffic control signs are prioritized and typically replaced within 24-48 hours. Standard street name signs are replaced within 5-7 business days. For traffic signals or signal poles, these are higher priority and addressed within 2-4 hours if affecting safety.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": true,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": []
+      },
+      "status": "passed",
+      "response_time": 0.22274518013000488
+    },
+    {
+      "id": 45,
+      "question": "How do I report a streetlight problem?",
+      "category": "Street Maintenance",
+      "subcategory": "Street Lights",
+      "question_type": "how_to",
+      "approved_answer": "To report streetlight issues (light out, flickering, on during day, damaged pole), call 311 with the nearest address or intersection. If possible, note the pole number (on a sticker on the pole). LG&E maintains streetlights in Louisville Metro - 311 will forward your request to them. Standard repairs typically take 3-5 business days. For multiple lights out in an area, report all locations. For damaged poles or downed lines, this is higher priority and typically addressed within 24 hours.",
+      "agent_response": "To report streetlight issues (light out, flickering, on during day, damaged pole), call 311 with the nearest address or intersection. If possible, note the pole number (on a sticker on the pole). LG&amp;E maintains streetlights in Louisville Metro - 311 will forward your request to them. Standard repairs typically take 3-5 business days. For multiple lights out in an area, report all locations. For damaged poles or downed lines, this is higher priority and typically addressed within 24 hours.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 0.9959595959595959,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Street Lights"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.21724271774291992
+    },
+    {
+      "id": 35,
+      "question": "How do I report a utility problem or emergency?",
+      "category": "Utilities",
+      "subcategory": "Utility Services",
+      "question_type": "how_to",
+      "approved_answer": "For utility emergencies, call the appropriate utility company directly: LG&E (electric/gas): (502) 589-1444 | Louisville Water: (502) 583-6610 | AT&T: (800) 288-2020. For downed power lines, gas leaks, or water main breaks, ALSO call 911. You can report utility issues to 311, but they will refer you to the utility company. For ongoing service quality issues or billing disputes, contact the utility company customer service. For utility line locates before digging, call 811 at least 2 business days in advance.",
+      "agent_response": "For utility emergencies, call the appropriate utility company directly: LG&amp;E (electric/gas): (502) 589-1444 | Louisville Water: (502) 583-6610 | AT&amp;T: (800) 288-2020. For downed power lines, gas leaks, or water main breaks, ALSO call 911. You can report utility issues to 311, but they will refer you to the utility company. For ongoing service quality issues or billing disputes, contact the utility company customer service. For utility line locates before digging, call 811 at least 2 business days in advance.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 0.9922630560928434,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Utilities"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.2249152660369873
+    },
+    {
+      "id": 6,
+      "question": "How do I request bulk trash pickup?",
+      "category": "Waste Management",
+      "subcategory": "Bulk Pickup",
+      "question_type": "how_to",
+      "approved_answer": "To request bulk item pickup, call 311 with your address. Louisville Metro offers scheduled bulk pickup based on your neighborhood. Set items at the curb the night before your pickup day. Acceptable items include furniture, appliances, mattresses, and large household items. For faster service, you can also schedule pickup through the online portal at louisvilleky.gov/311 or the mobile app.",
+      "agent_response": "To request bulk item pickup, call 311 with your address. Louisville Metro offers scheduled bulk pickup based on your neighborhood. Set items at the curb the night before your pickup day. Acceptable items include furniture, appliances, mattresses, and large household items. For faster service, you can also schedule pickup through the online portal at louisvilleky.gov/311 or the mobile app.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Large Item Appointment"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.2173161506652832
+    },
+    {
+      "id": 7,
+      "question": "When is my regular trash pickup day?",
+      "category": "Waste Management",
+      "subcategory": "Regular Collection",
+      "question_type": "what_is",
+      "approved_answer": "To find your specific trash pickup day, call 311 with your address or visit louisvilleky.gov/311 and enter your address. Regular trash pickup is weekly and varies by neighborhood. You can also download the Louisville Metro mobile app to see your collection schedule and set reminders.",
+      "agent_response": "To find your specific trash pickup day, call 311 with your address or visit louisvilleky.gov/311 and enter your address. Regular trash pickup is weekly and varies by neighborhood. You can also download the Louisville Metro mobile app to see your collection schedule and set reminders.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Waste Management"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.2245008945465088
+    },
+    {
+      "id": 8,
+      "question": "My trash wasn't picked up. What should I do?",
+      "category": "Waste Management",
+      "subcategory": "Missed Pickup",
+      "question_type": "how_to",
+      "approved_answer": "If your trash was missed, call 311 to report it right away. Provide your address and the type of collection that was missed (regular trash, recycling, or yard waste). They'll schedule a makeup pickup, usually within 24-48 hours. Make sure your bins were placed at the curb by 6 AM on your collection day and that items comply with collection guidelines.",
+      "agent_response": "If your trash was missed, call 311 to report it right away. Provide your address and the type of collection that was missed (regular trash, recycling, or yard waste). They'll schedule a makeup pickup, usually within 24-48 hours. Make sure your bins were placed at the curb by 6 AM on your collection day and that items comply with collection guidelines.",
+      "validation": {
+        "is_valid": true,
+        "similarity_score": 1.0,
+        "contains_keywords": true,
+        "mentions_service": false,
+        "has_contact_info": true,
+        "has_procedure": true,
+        "issues": [
+          "Does not mention service: Waste Management"
+        ]
+      },
+      "status": "passed",
+      "response_time": 0.24593806266784668
+    },
+    {
+      "id": 9,
+      "question": "What can I recycle?",
+      "category": "Waste Management",
+      "status": "error",
+      "error": "Could not find assistant message start tag",
+      "response_time": 0.004442930221557617
+    },
+    {
+      "id": 10,
+      "question": "How do I dispose of yard waste?",
+      "category": "Waste Management",
+      "status": "error",
+      "error": "Could not find assistant message start tag",
+      "response_time": 0.005386829376220703
+    },
+    {
+      "id": 30,
+      "question": "How do I report improper trash or garbage disposal?",
+      "category": "Waste Management",
+      "status": "error",
+      "error": "Could not find assistant message start tag",
+      "response_time": 0.00537872314453125
+    },
+    {
+      "id": 40,
+      "question": "How do I report a solid waste violation?",
+      "category": "Waste Management",
+      "status": "error",
+      "error": "Could not find assistant message start tag",
+      "response_time": 0.003421306610107422
+    },
+    {
+      "id": 41,
+      "question": "How do I report litter or trash in public areas?",
+      "category": "Waste Management",
+      "status": "error",
+      "error": "Could not find assistant message start tag",
+      "response_time": 0.0026209354400634766
+    },
+    {
+      "id": 50,
+      "question": "How do I schedule a large item or bulk trash pickup?",
+      "category": "Waste Management",
+      "status": "error",
+      "error": "Could not find assistant message start tag",
+      "response_time": 0.004309892654418945
+    },
+    {
+      "id": 22,
+      "question": "How do I report a water main break?",
+      "category": "Water/Sewer",
+      "status": "error",
+      "error": "Could not find assistant message start tag",
+      "response_time": 0.00494384765625
+    },
+    {
+      "id": 23,
+      "question": "How do I report a sewer backup?",
+      "category": "Water/Sewer",
+      "status": "error",
+      "error": "Could not find assistant message start tag",
+      "response_time": 0.0027031898498535156
+    },
+    {
+      "id": 32,
+      "question": "How do I report drainage or sewer problems?",
+      "category": "Water/Sewer",
+      "status": "error",
+      "error": "Could not find assistant message start tag",
+      "response_time": 0.003206968307495117
+    }
+  ],
+  "summary": {
+    "total": 53,
+    "passed": 44,
+    "failed": 0,
+    "errors": 9,
+    "average_similarity": 0.9625428925786653,
+    "response_time_avg": 0.18851827675441526
+  }
+}

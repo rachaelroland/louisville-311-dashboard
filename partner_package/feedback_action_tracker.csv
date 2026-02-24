@@ -1,0 +1,21 @@
+ID,Question_Short,Oliver_Decision,Priority,Action_Required,Current_Category,Recommended_Category,Status,SME_Needed
+waste_cart_001,Get trash cart,KEEP,CRITICAL,None - Answer OK,Cart Management,Cart Management,✅ APPROVED,No
+waste_cart_002,Get recycling cart,KEEP,CRITICAL,Workflow integration discussion,Cart Management - Recycling,Cart Management,⚠️ STRATEGIC DECISION,No
+waste_cart_003,Replace damaged cart,KEEP,CRITICAL,Category change + Workflow discussion,Cart Replacement,Cart Management,🔧 CATEGORY FIX,No
+waste_cart_004,Report stolen cart,KEEP,CRITICAL,Workflow integration discussion,Cart Theft,Cart Management,⚠️ STRATEGIC DECISION,No
+waste_cart_005,Cart weight limit,KEEP,CRITICAL,None - Good answer,Cart Limits,Cart Limits,✅ APPROVED,No
+waste_cart_006,Get extra cart,KEEP,CRITICAL,Verify if 2nd recycling carts are free,Extra Cart,Cart Management,🔴 VERIFY ACCURACY,Yes
+waste_schedule_001,Holiday pickup?,KEEP,CRITICAL,None - Good answer (similar to 002),Holiday Schedule,Holiday Schedule,✅ APPROVED,No
+waste_schedule_002,Holiday delays?,KEEP,CRITICAL,Category change (merge with 001),Holiday Delay,Holiday Schedule,🔧 CATEGORY FIX,No
+waste_hazardous_001,Where dispose hazardous waste,KEEP,CRITICAL,None - Good answer,Hazardous Waste Disposal,Hazardous Waste Disposal,✅ APPROVED,No
+waste_hazardous_002,How dispose paint,KEEP,CRITICAL,None - Good answer (category optional),Paint Disposal,Hazardous Waste Disposal,✅ APPROVED (🔧 optional),No
+waste_hazardous_003,Where dispose batteries,KEEP,CRITICAL,None - Good answer (category optional),Battery Disposal,Hazardous Waste Disposal,✅ APPROVED (🔧 optional),No
+waste_hazardous_004,How dispose electronics,KEEP,CRITICAL,None - Good answer,Electronics Disposal,Electronics Disposal,✅ APPROVED,No
+waste_schedule_003,What are pickup dates for THIS address,REMOVE,CRITICAL,Remove question - unclear/bad,Pickup Schedule,N/A - Remove,🔴 REMOVE,No
+waste_eligibility_001,Is address eligible for service,KEEP,CRITICAL,Workflow integration discussion,Service Eligibility,Service Eligibility,⚠️ STRATEGIC DECISION,No
+waste_missed_001,Report missed pickup,KEEP,CRITICAL,Fix answer - incomplete and wrong,Missed Pickup,Missed Pickup,🔴 FIX ANSWER,Yes
+waste_dumping_001,Report illegal dumping,KEEP,CRITICAL,Workflow integration discussion,Illegal Dumping,Illegal Dumping,⚠️ STRATEGIC DECISION,No
+waste_department_001,Which dept handles waste,KEEP,CRITICAL,Fix answer - incomplete and wrong,Department Info,Department Info,🔴 FIX ANSWER,Yes
+waste_forms_001,Where find waste forms,UNCERTAIN,CRITICAL,Add info on which services DO need forms,Forms & Resources,Forms & Resources,🔴 IMPROVE ANSWER,Yes
+waste_schedule_004,What time put cart out,KEEP,CRITICAL,Category change - too obscure,Cart Placement Timing,Pickup Schedule,🔧 CATEGORY FIX,No
+waste_schedule_005,Can put cart out night before,KEEP,CRITICAL,Category change - too obscure,Cart Timing - Night Before,Pickup Schedule,🔧 CATEGORY FIX,No

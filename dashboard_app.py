@@ -15,6 +15,9 @@ from datetime import datetime
 import requests
 import uuid
 from collections import defaultdict, deque
+import psycopg2
+from psycopg2.pool import SimpleConnectionPool
+from psycopg2.extras import RealDictCursor
 
 # ============================================================================
 # CONFIGURATION
@@ -46,6 +49,84 @@ if OPENROUTER_API_KEY:
 else:
     CHAT_ENABLED = False
     print("⚠️  OpenRouter API key not found - chat disabled")
+
+# ============================================================================
+# DATABASE CONNECTION (Approved Questions)
+# ============================================================================
+
+SUPABASE_HOST = "db.cxzhgidmzosdavugggks.supabase.co"
+SUPABASE_DB = "postgres"
+SUPABASE_USER = "postgres"
+SUPABASE_PASSWORD = os.getenv("SUPABASE_PASSWORD", "5kvsZGhH")  # Default for dev
+
+# Create connection pool
+db_pool = None
+if SUPABASE_PASSWORD:
+    try:
+        db_pool = SimpleConnectionPool(
+            minconn=1,
+            maxconn=10,
+            host=SUPABASE_HOST,
+            database=SUPABASE_DB,
+            user=SUPABASE_USER,
+            password=SUPABASE_PASSWORD,
+            port=5432
+        )
+        print("✅ Database connection pool initialized - approved questions enabled")
+    except Exception as e:
+        print(f"⚠️  Database connection failed: {e}")
+        print("   Chat will fall back to generic Claude responses")
+        db_pool = None
+else:
+    print("⚠️  SUPABASE_PASSWORD not set - approved questions disabled")
+
+# ============================================================================
+# DATABASE CONNECTION MANAGEMENT (Supabase Best Practices)
+# ============================================================================
+
+import time
+from contextlib import contextmanager
+
+@contextmanager
+def get_db_connection():
+    """
+    Context manager for database connections with proper lifecycle management
+    Implements Supabase best practices for connection pooling
+
+    Usage:
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            # ... use connection
+    """
+    conn = None
+    try:
+        if not db_pool:
+            raise Exception("Database pool not initialized")
+
+        conn = db_pool.getconn()
+        yield conn
+
+    except Exception as e:
+        print(f"⚠️  Database connection error: {e}")
+        if conn:
+            conn.rollback()  # Rollback on error
+        raise
+    finally:
+        if conn:
+            db_pool.putconn(conn)
+
+def log_slow_query(query_name: str, duration: float, threshold: float = 0.5):
+    """
+    Log queries that exceed performance threshold
+    Implements monitoring best practices
+
+    Args:
+        query_name: Name/description of the query
+        duration: Query execution time in seconds
+        threshold: Threshold in seconds (default: 0.5s)
+    """
+    if duration > threshold:
+        print(f"⚠️  SLOW QUERY: {query_name} took {duration:.3f}s (threshold: {threshold}s)")
 
 # ============================================================================
 # CONVERSATION MEMORY
@@ -208,6 +289,327 @@ def generate_follow_up_questions(user_question: str):
 
     # Return up to 3 unique follow-ups
     return list(dict.fromkeys(follow_ups))[:3]
+
+def extract_question_context(user_question: str):
+    """
+    Extract topics, entities, and intent from user question using Claude
+    Uses fast extraction to enhance search
+
+    Returns:
+        dict with keys: topics, entities, category_hints, keywords
+    """
+    if not OPENROUTER_API_KEY:
+        return None
+
+    try:
+        # Use Claude to quickly extract context
+        response = requests.post(
+            url="https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": "anthropic/claude-sonnet-4.5:beta",
+                "messages": [{
+                    "role": "user",
+                    "content": f"""Extract structured information from this 311 service question:
+
+Question: "{user_question}"
+
+Return JSON with:
+1. topics: list of main topics (e.g., "waste management", "street maintenance", "code enforcement")
+2. entities: list of extracted entities (locations, dates, specific items)
+3. category_hints: list of likely 311 categories (Animal Control, Code Enforcement, Emergency Services, Environmental, General, Health, Parking, Parks, Social Services, Street Maintenance, Utilities, Waste Management, Water/Sewer)
+4. keywords: list of important keywords for search
+
+Example:
+{{"topics": ["waste management", "trash pickup"], "entities": ["bulk item"], "category_hints": ["Waste Management"], "keywords": ["bulk", "trash", "pickup", "schedule"]}}
+
+Return only valid JSON, no explanation."""
+                }],
+                "max_tokens": 200,
+                "temperature": 0
+            },
+            timeout=5
+        )
+
+        if response.status_code == 200:
+            result = response.json()
+            content = result['choices'][0]['message']['content']
+
+            # Parse JSON from response
+            import re
+            json_match = re.search(r'\{.*\}', content, re.DOTALL)
+            if json_match:
+                context = json.loads(json_match.group(0))
+                return context
+
+        return None
+
+    except Exception as e:
+        print(f"⚠️  Error extracting question context: {e}")
+        return None
+
+def find_approved_answer(user_question: str, use_context: bool = False):
+    """
+    Search l311_approved_questions for best matching Q&A pair
+    Uses PostgreSQL full-text search, optionally enhanced with topic/entity extraction
+
+    Implements Supabase best practices:
+    - Proper connection lifecycle management
+    - Query performance monitoring
+    - Graceful error handling
+
+    Args:
+        user_question: The user's question text
+        use_context: Whether to extract topics/entities for enhanced search (default: False for reliability)
+
+    Returns:
+        dict with keys: id, question_text, answer_text, service_name, category
+        or None if no match found
+    """
+    if not db_pool:
+        return None
+
+    start_time = time.time()
+
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
+
+            # Try standard search first (reliable and fast)
+            # Note: Uses GIN indexes on question_text and keywords for performance
+            query_start = time.time()
+            query = """
+            SELECT
+                id,
+                question_text,
+                answer_text,
+                service_name,
+                category,
+                typical_urgency,
+                ts_rank(
+                    to_tsvector('english', question_text || ' ' || array_to_string(keywords, ' ')),
+                    plainto_tsquery('english', %s)
+                ) as rank
+            FROM l311_approved_questions
+            WHERE
+                to_tsvector('english', question_text || ' ' || array_to_string(keywords, ' '))
+                @@ plainto_tsquery('english', %s)
+                AND is_approved = true
+            ORDER BY rank DESC
+            LIMIT 1
+            """
+
+            cursor.execute(query, (user_question, user_question))
+            result = cursor.fetchone()
+
+            query_duration = time.time() - query_start
+            log_slow_query("standard_search", query_duration, threshold=0.1)
+
+            # If no result with standard search and context enabled, try enhanced search
+            if not result and use_context:
+                print(f"   🔍 No standard match, trying enhanced search with context extraction...")
+
+                context = extract_question_context(user_question)
+
+                if context and context.get('category_hints'):
+                    categories = context['category_hints']
+                    keywords = context.get('keywords', [])
+                    all_terms = user_question + ' ' + ' '.join(keywords)
+
+                    print(f"   📋 Enhanced search - categories: {categories}, keywords: {keywords[:5]}")
+
+                    query_start = time.time()
+                    # Enhanced query with category boosting
+                    # Uses composite index on (category, is_approved) for performance
+                    query = """
+                    WITH ranked_results AS (
+                        SELECT
+                            id,
+                            question_text,
+                            answer_text,
+                            service_name,
+                            category,
+                            typical_urgency,
+                            ts_rank(
+                                to_tsvector('english', question_text || ' ' || array_to_string(keywords, ' ')),
+                                plainto_tsquery('english', %s)
+                            ) as search_rank,
+                            CASE
+                                WHEN category = ANY(%s) THEN 2.0
+                                ELSE 1.0
+                            END as category_boost
+                        FROM l311_approved_questions
+                        WHERE
+                            is_approved = true
+                            AND (
+                                to_tsvector('english', question_text || ' ' || array_to_string(keywords, ' '))
+                                @@ plainto_tsquery('english', %s)
+                                OR category = ANY(%s)
+                            )
+                    )
+                    SELECT id, question_text, answer_text, service_name, category, typical_urgency
+                    FROM ranked_results
+                    ORDER BY search_rank * category_boost DESC
+                    LIMIT 1
+                    """
+
+                    cursor.execute(query, (all_terms, categories, all_terms, categories))
+                    result = cursor.fetchone()
+
+                    query_duration = time.time() - query_start
+                    log_slow_query("enhanced_search", query_duration, threshold=0.2)
+
+            cursor.close()
+
+            # Log total function execution time
+            total_duration = time.time() - start_time
+            if total_duration > 0.05:  # Log if > 50ms
+                print(f"   ⏱️  find_approved_answer took {total_duration:.3f}s")
+
+            if result:
+                result_dict = dict(result)
+                return result_dict
+            else:
+                return None
+
+    except Exception as e:
+        print(f"⚠️  Error searching approved questions: {e}")
+        import traceback
+        traceback.print_exc()
+        return None
+
+
+def increment_question_shown(question_id: int):
+    """
+    Increment times_shown counter for an approved question
+
+    Implements Supabase best practices:
+    - Proper connection lifecycle with context manager
+    - Performance monitoring
+
+    Args:
+        question_id: ID of the question in l311_approved_questions
+    """
+    if not db_pool:
+        return
+
+    start_time = time.time()
+
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+
+            cursor.execute("""
+                UPDATE l311_approved_questions
+                SET times_shown = times_shown + 1
+                WHERE id = %s
+            """, (question_id,))
+
+            conn.commit()
+            cursor.close()
+
+            duration = time.time() - start_time
+            log_slow_query("increment_question_shown", duration, threshold=0.05)
+
+    except Exception as e:
+        print(f"⚠️  Error incrementing question counter: {e}")
+
+
+def enrich_answer_with_data_insights(approved_answer: dict, user_question: str, context: dict = None):
+    """
+    Enrich approved answer with insights from historical 311 data
+    Uses NER, topics, and sentiment from analyzed requests
+
+    Args:
+        approved_answer: The approved answer dict
+        user_question: User's original question
+        context: Extracted context (topics, entities, etc.)
+
+    Returns:
+        Enhanced answer text with data insights (or original if no insights)
+    """
+    try:
+        base_answer = approved_answer['answer_text']
+        category = approved_answer.get('category')
+        service_name = approved_answer.get('service_name')
+
+        # Check if we have relevant historical data
+        if service_name and len(df) > 0:
+            # Filter data for this service
+            service_data = df[df['service_name'] == service_name]
+
+            if len(service_data) > 0:
+                # Calculate insights
+                total_requests = len(service_data)
+                avg_urgency = service_data['urgency_score'].mean() if 'urgency_score' in service_data.columns else None
+                sentiment_dist = service_data['sentiment'].value_counts().to_dict() if 'sentiment' in service_data.columns else {}
+
+                # Build insight footer (subtle, not intrusive)
+                insights = []
+
+                if total_requests >= 100:
+                    insights.append(f"📊 Based on {total_requests:,} similar requests in our data")
+
+                if avg_urgency and avg_urgency >= 7:
+                    insights.append("⚠️ This is typically a high-priority issue")
+
+                # Only add insights if we have meaningful data
+                if insights:
+                    insight_text = "\n\n" + " • ".join(insights)
+                    return base_answer + insight_text
+
+        return base_answer
+
+    except Exception as e:
+        print(f"⚠️  Error enriching answer: {e}")
+        return approved_answer['answer_text']
+
+
+def update_question_feedback(question_id: int, is_helpful: bool):
+    """
+    Update helpful/not helpful counters for an approved question
+
+    Implements Supabase best practices:
+    - Proper connection lifecycle with context manager
+    - Performance monitoring
+
+    Args:
+        question_id: ID of the question in l311_approved_questions
+        is_helpful: True for thumbs up, False for thumbs down
+    """
+    if not db_pool:
+        return
+
+    start_time = time.time()
+
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+
+            if is_helpful:
+                cursor.execute("""
+                    UPDATE l311_approved_questions
+                    SET times_helpful = times_helpful + 1
+                    WHERE id = %s
+                """, (question_id,))
+            else:
+                cursor.execute("""
+                    UPDATE l311_approved_questions
+                    SET times_not_helpful = times_not_helpful + 1
+                    WHERE id = %s
+                """, (question_id,))
+
+            conn.commit()
+            cursor.close()
+
+            duration = time.time() - start_time
+            log_slow_query("update_question_feedback", duration, threshold=0.05)
+
+    except Exception as e:
+        print(f"⚠️  Error updating feedback counter: {e}")
 
 # ============================================================================
 # FASTHTML APP SETUP
@@ -1683,7 +2085,7 @@ def get(request):
     )
 
 @rt('/chat/feedback')
-def post(message_id: str, feedback: str):
+def post(message_id: str, feedback: str, question_id: str = None):
     """Handle feedback for a chat message"""
     try:
         # Load existing feedback
@@ -1694,15 +2096,32 @@ def post(message_id: str, feedback: str):
             feedback_data = []
 
         # Add new feedback
-        feedback_data.append({
+        feedback_entry = {
             'message_id': message_id,
             'feedback': feedback,
             'timestamp': datetime.now().isoformat()
-        })
+        }
 
-        # Save feedback
+        if question_id:
+            feedback_entry['question_id'] = question_id
+
+        feedback_data.append(feedback_entry)
+
+        # Save feedback to file
         with open(FEEDBACK_PATH, 'w') as f:
             json.dump(feedback_data, f, indent=2)
+
+        # NEW: Update database if this was an approved answer
+        if question_id:
+            try:
+                q_id = int(question_id)
+                is_helpful = (feedback == 'positive')
+                update_question_feedback(q_id, is_helpful)
+                print(f"✅ Updated database feedback for question #{q_id}: {'helpful' if is_helpful else 'not helpful'}")
+            except ValueError:
+                print(f"⚠️  Invalid question_id format: {question_id}")
+            except Exception as e:
+                print(f"⚠️  Error updating database feedback: {e}")
 
         # Return success message
         if feedback == 'positive':
@@ -1710,6 +2129,7 @@ def post(message_id: str, feedback: str):
         else:
             return Span("Thanks for the feedback. We'll work on improving! 👎", cls="feedback-message")
     except Exception as e:
+        print(f"⚠️  Error saving feedback: {e}")
         return Span("Error saving feedback", cls="feedback-message")
 
 @rt('/chat/ask')
@@ -1746,7 +2166,24 @@ def post(message: str, request):
     # Get conversation history for this session
     history = chat_sessions[session_id]
 
-    # Build messages array with history
+    # NEW: Search approved questions FIRST
+    # Enable context extraction for better conversational question matching
+    approved_match = find_approved_answer(message, use_context=True)
+    use_approved_answer = False
+    matched_question_id = None
+
+    if approved_match:
+        # Found approved answer - will use it
+        use_approved_answer = True
+        matched_question_id = approved_match['id']
+
+        # Track usage
+        increment_question_shown(matched_question_id)
+
+        # Log for monitoring
+        print(f"✅ Using approved answer #{matched_question_id}: {approved_match['question_text'][:50]}...")
+
+    # Build messages array with history (still needed for context even with approved answers)
     messages = [{"role": "system", "content": CHAT_CONTEXT}]
 
     # Add conversation history (last 10 exchanges = 20 messages)
@@ -1763,34 +2200,50 @@ def post(message: str, request):
         style="display: flex; flex-direction: column; align-items: flex-end;"
     )
 
-    # Call OpenRouter API (Claude Sonnet 4.5 via OpenRouter)
+    # Get response: Use approved answer OR call Claude
     try:
-        api_response = requests.post(
-            url="https://openrouter.ai/api/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-                "Content-Type": "application/json",
-                "HTTP-Referer": "https://louisville-311-dashboard.onrender.com",
-                "X-Title": "Louisville 311 Dashboard"
-            },
-            json={
-                "model": "anthropic/claude-sonnet-4.5:beta",
-                "messages": messages,
-                "max_tokens": 1024,
-                "temperature": 0.7
-            },
-            timeout=30
-        )
-
-        if api_response.status_code == 200:
-            response_data = api_response.json()
-            assistant_text = response_data['choices'][0]['message']['content']
+        if use_approved_answer and approved_match:
+            # Use approved answer from database, enriched with historical data insights
+            assistant_text = enrich_answer_with_data_insights(
+                approved_match,
+                message,
+                context=None  # Could pass extracted context here for even richer insights
+            )
 
             # Store conversation in history
             history.append({"role": "user", "content": message})
             history.append({"role": "assistant", "content": assistant_text})
+
         else:
-            assistant_text = f"I apologize, but I encountered an error (HTTP {api_response.status_code}). Please try again."
+            # No approved answer - use Claude as fallback
+            print(f"ℹ️  No approved answer found, using Claude fallback for: {message[:50]}...")
+
+            api_response = requests.post(
+                url="https://openrouter.ai/api/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "https://louisville-311-dashboard.onrender.com",
+                    "X-Title": "Louisville 311 Dashboard"
+                },
+                json={
+                    "model": "anthropic/claude-sonnet-4.5:beta",
+                    "messages": messages,
+                    "max_tokens": 1024,
+                    "temperature": 0.7
+                },
+                timeout=30
+            )
+
+            if api_response.status_code == 200:
+                response_data = api_response.json()
+                assistant_text = response_data['choices'][0]['message']['content']
+
+                # Store conversation in history
+                history.append({"role": "user", "content": message})
+                history.append({"role": "assistant", "content": assistant_text})
+            else:
+                assistant_text = f"I apologize, but I encountered an error (HTTP {api_response.status_code}). Please try again."
 
     except requests.exceptions.Timeout:
         assistant_text = "I apologize, but the request timed out. Please try again."
@@ -1809,6 +2262,20 @@ def post(message: str, request):
     # Generate follow-up questions based on user's question
     follow_ups = generate_follow_up_questions(message)
 
+    # Build feedback values with question_id if approved answer was used
+    feedback_vals_positive = {
+        "message_id": message_id,
+        "feedback": "positive"
+    }
+    feedback_vals_negative = {
+        "message_id": message_id,
+        "feedback": "negative"
+    }
+
+    if matched_question_id:
+        feedback_vals_positive["question_id"] = str(matched_question_id)
+        feedback_vals_negative["question_id"] = str(matched_question_id)
+
     # Assistant message bubble with feedback buttons
     assistant_msg = Div(
         Div(assistant_text, cls="message assistant-message"),
@@ -1818,7 +2285,7 @@ def post(message: str, request):
                 "👍",
                 cls="feedback-btn",
                 hx_post="/chat/feedback",
-                hx_vals=f'{{"message_id": "{message_id}", "feedback": "positive"}}',
+                hx_vals=json.dumps(feedback_vals_positive),
                 hx_target="closest div",
                 hx_swap="afterend",
                 title="Helpful response"
@@ -1827,7 +2294,7 @@ def post(message: str, request):
                 "👎",
                 cls="feedback-btn",
                 hx_post="/chat/feedback",
-                hx_vals=f'{{"message_id": "{message_id}", "feedback": "negative"}}',
+                hx_vals=json.dumps(feedback_vals_negative),
                 hx_target="closest div",
                 hx_swap="afterend",
                 title="Not helpful"

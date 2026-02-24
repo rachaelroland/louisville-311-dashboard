@@ -1,0 +1,167 @@
+{
+  "phase": "Phase 1 - Critical Priority",
+  "total_questions": 15,
+  "category": "Waste Management",
+  "estimated_impact": "40-50% waste call deflection",
+  "sources": [
+    "https://louisvilleky.gov/government/public-works/services/garbage-collection",
+    "https://louisvilleky.gov/government/public-works/services/recycling",
+    "https://louisvilleky.gov/government/public-works/services/hazardous-materials-disposal-haz-bin",
+    "https://louisvilleky.gov/government/public-works/waste-reduction-center"
+  ],
+  "questions": [
+    {
+      "id": "waste_cart_001",
+      "question_text": "How do I get a trash cart?",
+      "answer_text": "Trash carts are provided FREE to residents in Louisville's Urban Services District. If you're a new resident or need a cart, call 311 and request 'Waste Container Request - New.' The standard size is 95 gallons. Your cart will be delivered to your address within 7-10 business days. The cart remains city property.",
+      "category": "Waste Management",
+      "subcategory": "Cart Management",
+      "keywords": ["trash cart", "garbage cart", "get cart", "new cart", "request cart"],
+      "priority": "CRITICAL",
+      "estimated_volume": "HIGH"
+    },
+    {
+      "id": "waste_cart_002",
+      "question_text": "How do I get a recycling cart?",
+      "answer_text": "Call 311 and request a recycling cart by selecting 'Waste Container Request' then 'New.' The standard size is 95 gallons and is FREE for residents in the Urban Services District. You can also request online at louisvilleky.gov/311 or through the Recycle Coach app. Your cart will be delivered within 7-10 business days.",
+      "category": "Waste Management",
+      "subcategory": "Cart Management - Recycling",
+      "keywords": ["recycling cart", "recycle bin", "get recycling", "request recycling cart"],
+      "priority": "CRITICAL",
+      "estimated_volume": "HIGH"
+    },
+    {
+      "id": "waste_cart_003",
+      "question_text": "My trash cart is damaged or broken. How do I get it replaced?",
+      "answer_text": "Call 311 to report a damaged cart and request a replacement. Describe the damage (cracked body, broken wheels, damaged lid, etc.). Metro will schedule a replacement cart delivery, typically within 7-10 business days. The cart is city property, so replacement is FREE. Common issues include cracked carts, broken wheels, or damaged lids.",
+      "category": "Waste Management",
+      "subcategory": "Cart Replacement",
+      "keywords": ["damaged cart", "broken cart", "cracked cart", "cart replacement", "broken wheels", "damaged lid"],
+      "priority": "CRITICAL",
+      "estimated_volume": "MEDIUM-HIGH"
+    },
+    {
+      "id": "waste_cart_004",
+      "question_text": "My trash cart was stolen. What should I do?",
+      "answer_text": "Call 311 immediately to report the stolen cart and request a replacement. You may also want to file a police report by calling the non-emergency number: 502-574-5673. Metro will provide a replacement cart FREE of charge within 7-10 business days. Be sure to have your address ready when you call.",
+      "category": "Waste Management",
+      "subcategory": "Cart Theft",
+      "keywords": ["stolen cart", "missing cart", "cart theft", "cart disappeared"],
+      "priority": "CRITICAL",
+      "estimated_volume": "MEDIUM"
+    },
+    {
+      "id": "waste_cart_005",
+      "question_text": "What's the weight limit for my trash cart?",
+      "answer_text": "The maximum weight limit for your trash cart is 200 pounds. If your cart is too heavy, the automated lift on the collection truck may not be able to pick it up, and your trash will not be collected. Make sure the lid closes completely - if it doesn't, the cart may be too full or too heavy. Reduce the weight by removing some items or requesting an additional cart.",
+      "category": "Waste Management",
+      "subcategory": "Cart Limits",
+      "keywords": ["weight limit", "cart weight", "too heavy", "200 pounds", "cart capacity"],
+      "priority": "CRITICAL",
+      "estimated_volume": "MEDIUM"
+    },
+    {
+      "id": "waste_cart_006",
+      "question_text": "Can I get an extra trash or recycling cart?",
+      "answer_text": "Yes, you can request an additional cart if needed. Call 311 and explain why you need an extra cart (large family, excess recyclables, etc.). There may be an additional monthly fee for a second trash cart, but additional recycling carts are typically provided FREE. Metro will evaluate your request and let you know if approved. The standard cart size is 95 gallons.",
+      "category": "Waste Management",
+      "subcategory": "Extra Cart",
+      "keywords": ["extra cart", "second cart", "additional cart", "another cart", "more carts"],
+      "priority": "CRITICAL",
+      "estimated_volume": "MEDIUM"
+    },
+    {
+      "id": "waste_schedule_001",
+      "question_text": "Is there trash pickup on holidays?",
+      "answer_text": "No, there is NO waste collection on Metro Government holidays. These holidays are: New Year's Day, Martin Luther King Jr. Day, Memorial Day, Independence Day, Labor Day, Thanksgiving Day, and Christmas Day. When a holiday falls during the week, your collection will be delayed by one day for the rest of that week.",
+      "category": "Waste Management",
+      "subcategory": "Holiday Schedule",
+      "keywords": ["holiday pickup", "holiday schedule", "trash holiday", "no pickup", "closed holidays"],
+      "priority": "CRITICAL",
+      "estimated_volume": "HIGH (seasonal spikes)"
+    },
+    {
+      "id": "waste_schedule_002",
+      "question_text": "What happens to my trash schedule when there's a holiday?",
+      "answer_text": "When a Metro holiday falls during the week, all trash, recycling, and yard waste collections are delayed by ONE DAY for the rest of that week. For example, if Monday is a holiday, Monday's route runs on Tuesday, Tuesday's route runs on Wednesday, and so on. Download the free Recycle Coach app to get automatic schedule updates and reminders. You can also call 311 to confirm your adjusted schedule.",
+      "category": "Waste Management",
+      "subcategory": "Holiday Delay",
+      "keywords": ["holiday delay", "delayed pickup", "schedule change", "one day delay", "holiday week"],
+      "priority": "CRITICAL",
+      "estimated_volume": "HIGH (seasonal spikes)"
+    },
+    {
+      "id": "waste_hazardous_001",
+      "question_text": "Where can I dispose of hazardous waste in Louisville?",
+      "answer_text": "Take household hazardous waste to the Haz Bin at 7501 Grade Lane. Hours: Tuesday-Saturday, 9:30 AM - 4:00 PM. It's FREE for Louisville/Jefferson County residents. Accepted items include: paint, motor oil, batteries, gasoline, cleaners, pesticides, fire extinguishers, fluorescent light bulbs, chemicals, antifreeze, and more. Do NOT put hazardous waste in your regular trash. This facility is for residents only, not businesses.",
+      "category": "Waste Management",
+      "subcategory": "Hazardous Waste Disposal",
+      "keywords": ["hazardous waste", "haz bin", "dangerous items", "chemicals", "disposal center", "Grade Lane"],
+      "priority": "CRITICAL",
+      "estimated_volume": "HIGH"
+    },
+    {
+      "id": "waste_hazardous_002",
+      "question_text": "How do I dispose of paint?",
+      "answer_text": "Oil-based paint or lead paint: Take to the Haz Bin at 7501 Grade Lane (Tuesday-Saturday, 9:30 AM-4 PM, FREE for residents). Latex paint: Can go in your regular trash ONLY if the paint is completely dry. To dry latex paint, remove the lid, add kitty litter or sand, let it harden completely, then place in trash with the lid off so collectors can see it's dry. Do NOT pour paint down drains.",
+      "category": "Waste Management",
+      "subcategory": "Paint Disposal",
+      "keywords": ["paint disposal", "dispose paint", "old paint", "latex paint", "oil paint", "haz bin"],
+      "priority": "CRITICAL",
+      "estimated_volume": "MEDIUM-HIGH"
+    },
+    {
+      "id": "waste_hazardous_003",
+      "question_text": "Where can I dispose of batteries?",
+      "answer_text": "Take batteries to the Haz Bin at 7501 Grade Lane (Tuesday-Saturday, 9:30 AM-4 PM, FREE for residents). This includes auto batteries, household batteries (AA, AAA, C, D, 9V), and rechargeable batteries. Do NOT put batteries in your regular trash or recycling - they can cause fires in collection trucks. Many retailers (Best Buy, Home Depot, Lowe's) also accept batteries for recycling.",
+      "category": "Waste Management",
+      "subcategory": "Battery Disposal",
+      "keywords": ["battery disposal", "dispose batteries", "car battery", "household batteries", "rechargeable batteries", "haz bin"],
+      "priority": "CRITICAL",
+      "estimated_volume": "MEDIUM-HIGH"
+    },
+    {
+      "id": "waste_hazardous_004",
+      "question_text": "How do I dispose of electronics and e-waste?",
+      "answer_text": "Drop off electronics at the Waste Reduction Center (636 Meriwether Avenue) for FREE. You can bring up to 3 electronic items per day. Accepted items: TVs, computers, monitors, printers, microwaves, small appliances, cell phones, and other electronics. Hours: Monday-Saturday. Do NOT put electronics in your regular trash - they contain materials that need special recycling. Call 311 if you have large appliances (refrigerators, washers, etc.).",
+      "category": "Waste Management",
+      "subcategory": "Electronics Disposal",
+      "keywords": ["electronics", "e-waste", "TV disposal", "computer disposal", "recycle electronics", "appliances"],
+      "priority": "CRITICAL",
+      "estimated_volume": "MEDIUM-HIGH"
+    },
+    {
+      "id": "waste_schedule_003",
+      "question_text": "When is my recycling pickup day?",
+      "answer_text": "Your recycling pickup day is the same as your trash pickup day - they're collected on the same route. To find your specific day, call 311 with your address, visit louisvilleky.gov/311 and enter your address, or download the FREE Recycle Coach app which shows your personalized schedule. Recycling carts should be at the curb by 6 AM on your collection day, but no earlier than 4 PM the day before.",
+      "category": "Waste Management",
+      "subcategory": "Recycling Schedule",
+      "keywords": ["recycling day", "recycling schedule", "recycle pickup", "when recycling"],
+      "priority": "CRITICAL",
+      "estimated_volume": "HIGH"
+    },
+    {
+      "id": "waste_schedule_004",
+      "question_text": "What time should I put my trash cart out?",
+      "answer_text": "Place your cart at the curb no later than 6:00 AM on your collection day, but no earlier than 4:00 PM the day before collection. Position the cart at the edge of the curb or alley with the arrow on the lid pointing toward the street. Keep the cart at least 3 feet away from other carts, cars, mailboxes, or other objects so the automated lift can access it. Bring your cart back in promptly after collection.",
+      "category": "Waste Management",
+      "subcategory": "Cart Placement Timing",
+      "keywords": ["cart time", "when put out", "cart placement", "6 AM", "collection time"],
+      "priority": "CRITICAL",
+      "estimated_volume": "MEDIUM"
+    },
+    {
+      "id": "waste_schedule_005",
+      "question_text": "Can I put my trash out the night before pickup?",
+      "answer_text": "Yes, you can put your trash cart out as early as 4:00 PM the day before your scheduled pickup day. However, it must be out no later than 6:00 AM on collection day. Place the cart at the edge of the curb with the arrow pointing toward the street, at least 3 feet from other objects. Avoid putting carts out too early as they may be knocked over by wind, animals, or vehicles. Bring your cart back in promptly after collection.",
+      "category": "Waste Management",
+      "subcategory": "Cart Timing - Night Before",
+      "keywords": ["night before", "put out early", "day before", "4 PM", "early placement"],
+      "priority": "CRITICAL",
+      "estimated_volume": "MEDIUM"
+    }
+  ],
+  "validation_status": "DRAFT - Pending SME Review",
+  "created_date": "2026-02-15",
+  "notes": "All answers sourced from official Louisville Metro Public Works websites. Requires validation with Metro SME before adding to production database."
+}
